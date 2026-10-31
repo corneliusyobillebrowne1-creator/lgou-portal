@@ -1,0 +1,8 @@
+<p><a href="/teacher/courses">&larr; My courses</a></p>
+<h1><%= course.title %> <span class="badge <%= course.approval_status === 'approved' ? 'ok' : course.approval_status === 'pending' ? 'warn' : 'bad' %>"><%= course.approval_status %></span></h1>
+<div class="tabs">
+  <a href="/teacher/courses/<%= course.id %>" class="<%= tab === 'details' ? 'on' : '' %>">Details &amp; Classroom link</a>
+  <a href="/teacher/courses/<%= course.id %>/students" class="<%= tab === 'students' ? 'on' : '' %>">Students &amp; progress</a>
+  <a href="/teacher/courses/<%= course.id %>/attendance" class="<%= tab === 'attendance' ? 'on' : '' %>">Attendance</a>
+  <a href="/teacher/courses/<%= course.id %>/grades" class="<%= tab === 'grades' ? 'on' : '' %>">Grades</a>
+</div>

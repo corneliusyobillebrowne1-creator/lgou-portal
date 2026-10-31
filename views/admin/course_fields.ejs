@@ -1,0 +1,14 @@
+<label>Course title</label>
+<input type="text" name="title" required maxlength="120" value="<%= c.title %>">
+<div class="row">
+  <div><label>Type</label>
+  <select name="type"><option value="certificate" <%= c.type === 'certificate' ? 'selected' : '' %>>Certificate</option><option value="diploma" <%= c.type === 'diploma' ? 'selected' : '' %>>Diploma</option></select></div>
+  <div><label>Fee (USD)</label><input type="text" name="fee" required inputmode="decimal" value="<%= (c.fee_cents / 100).toFixed(2) %>"></div>
+  <div><label>Duration (weeks)</label><input type="number" name="duration_weeks" min="1" max="104" required value="<%= c.duration_weeks %>"></div>
+  <div><label>Pass mark (%)</label><input type="number" name="pass_mark" min="0" max="100" required value="<%= c.pass_mark %>"></div>
+</div>
+<label>Short summary (shown on course cards)</label>
+<input type="text" name="summary" maxlength="200" value="<%= c.summary %>">
+<label>Full description</label>
+<textarea name="description" maxlength="4000"><%= c.description %></textarea>
+<label><input type="checkbox" name="active" value="1" <%= c.active ? 'checked' : '' %>> Open for enrollment (shown on the public homepage)</label>

@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <h1>Admin dashboard</h1>
+  <div class="stats">
+    <div class="stat"><b><%= stats.students %></b><span>Students</span></div>
+    <div class="stat"><b><%= stats.enrollments %></b><span>Enrollments</span></div>
+    <div class="stat"><b><%= money(stats.revenue) %></b><span>Confirmed revenue</span></div>
+    <div class="stat alertish"><b><%= money(stats.owed) %></b><span>Fees owed by students</span></div>
+    <div class="stat <%= stats.pendingPayments ? 'alertish' : '' %>"><b><%= stats.pendingPayments %></b><span><a href="/admin/payments">Payments to confirm</a></span></div>
+    <div class="stat <%= stats.certRequests ? 'alertish' : '' %>"><b><%= stats.certRequests %></b><span><a href="/admin/approvals">Certificate requests</a></span></div>
+    <div class="stat <%= stats.teachersPending ? 'alertish' : '' %>"><b><%= stats.teachersPending %></b><span><a href="/admin/teachers?status=pending">Teacher applications</a></span></div>
+    <div class="stat"><b><%= stats.teachersApproved %></b><span><a href="/admin/teachers?status=approved">Approved teachers</a></span></div>
+    <div class="stat <%= stats.coursesPending ? 'alertish' : '' %>"><b><%= stats.coursesPending %></b><span><a href="/admin/course-approvals">Courses to approve</a></span></div>
+    <div class="stat"><b><%= stats.certsIssued %></b><span>Certificates issued</span></div>
+    <div class="stat"><b><%= lastBackup ? fmtDate(lastBackup.mtime.toISOString()) : 'Never' %></b><span><a href="/admin/settings">Last backup</a></span></div>
+  </div>
+
+  <h2>Recent activity</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>When (UTC)</th><th>User</th><th>Action</th><th>Detail</th><th>IP</th></tr></thead>
+    <tbody>
+    <% activity.forEach(a => { %>
+      <tr><td><%= a.created_at %></td><td><%= a.username || '-' %></td><td><%= a.action %></td><td><%= a.detail || '' %></td><td><%= a.ip || '' %></td></tr>
+    <% }) %>
+    </tbody>
+  </table></div>
+</div></main>
+<%- include('../partials/footer') %>

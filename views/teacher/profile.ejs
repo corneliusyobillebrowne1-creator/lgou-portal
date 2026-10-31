@@ -1,0 +1,19 @@
+<%- include('../partials/header') %>
+<main><div class="wrap"><div class="card formcard wide">
+  <h1>My public profile</h1>
+  <p class="muted">This is what students and visitors see on the website. Your email and phone are never shown. <a href="/teachers/<%= user.id %>">View public page</a></p>
+  <% if (error) { %><div class="alert err"><%= error %></div><% } %>
+  <form method="post" action="/teacher/profile">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label>Headline</label><input type="text" name="headline" required maxlength="100" value="<%= p.headline %>">
+    <div class="row">
+      <div><label>Subjects</label><input type="text" name="subjects" required maxlength="150" value="<%= p.subjects %>"></div>
+      <div><label>County</label><select name="county"><% counties.forEach(c => { %><option <%= p.county === c ? 'selected' : '' %>><%= c %></option><% }) %></select></div>
+      <div><label>Years of experience</label><input type="number" name="experience_years" min="0" max="60" required value="<%= p.experience_years %>"></div>
+    </div>
+    <label>Bio</label><textarea name="bio" required maxlength="1200"><%= p.bio %></textarea>
+    <label>Qualifications</label><textarea name="qualifications" required maxlength="800"><%= p.qualifications %></textarea>
+    <p><button class="btn" type="submit">Save profile</button></p>
+  </form>
+</div></div></main>
+<%- include('../partials/footer') %>

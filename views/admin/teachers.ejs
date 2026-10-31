@@ -1,0 +1,22 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <h1>Teachers</h1>
+  <div class="actions">
+    <% ['pending','approved','rejected','suspended'].forEach(s => { %>
+      <a class="btn small <%= status === s ? '' : 'ghost' %>" href="/admin/teachers?status=<%= s %>"><%= s %> (<%= counts[s] || 0 %>)</a>
+    <% }) %>
+  </div>
+  <% if (!teachers.length) { %><p>No <%= status %> teachers.</p><% } else { %>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>County</th><th>Subjects</th><th>Experience</th><th>Courses</th><th>Applied</th><th></th></tr></thead>
+    <tbody>
+    <% teachers.forEach(t => { %>
+      <tr><td><%= t.full_name %></td><td><%= t.username %></td><td><%= t.email %></td><td><%= t.county %></td><td><%= t.subjects %></td>
+      <td><%= t.experience_years %> yr</td><td><%= t.course_count %></td><td><%= fmtDate(t.created_at) %></td>
+      <td><a class="btn small" href="/admin/teachers/<%= t.user_id %>"><%= status === 'pending' ? 'Review' : 'Open' %></a></td></tr>
+    <% }) %>
+    </tbody>
+  </table></div>
+  <% } %>
+</div></main>
+<%- include('../partials/footer') %>

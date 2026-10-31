@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <%- include('_tabs') %>
+  <h2>Attendance: <%= session.session_date %><%= session.topic ? ' - ' + session.topic : '' %></h2>
+  <% if (groups.length) { %>
+    <p class="actions">Show: <a class="btn small <%= gid ? 'ghost' : '' %>" href="/teacher/courses/<%= course.id %>/attendance/<%= session.id %>">All students</a>
+    <% groups.forEach(g => { %><a class="btn small <%= gid === g.id ? '' : 'ghost' %>" href="/teacher/courses/<%= course.id %>/attendance/<%= session.id %>?group=<%= g.id %>"><%= g.name %></a><% }) %></p>
+  <% } %>
+  <% if (!students.length) { %><div class="card flat"><p>No paid students to mark.</p></div><% } else { %>
+  <form method="post" action="/teacher/courses/<%= course.id %>/attendance/<%= session.id %>">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <div class="tablewrap"><table>
+      <thead><tr><th>Student</th><th>Present</th><th>Late</th><th>Absent</th><th>Excused</th></tr></thead>
+      <tbody>
+      <% students.forEach(s => { const m = marks.get(s.id) || 'present'; %>
+        <tr><td><%= s.student_name %> <span class="muted">(<%= s.username %>)</span></td>
+        <% ['present','late','absent','excused'].forEach(st => { %>
+          <td><input type="radio" name="st_<%= s.id %>" value="<%= st %>" <%= m === st ? 'checked' : '' %> aria-label="<%= st %>"></td>
+        <% }) %></tr>
+      <% }) %>
+      </tbody>
+    </table></div>
+    <p class="muted">Students not yet marked default to "present". Excused absences are not counted against the student's attendance percentage.</p>
+    <p><button class="btn" type="submit">Save attendance</button> <a class="btn ghost" href="/teacher/courses/<%= course.id %>/attendance">Back</a></p>
+  </form>
+  <% } %>
+</div></main>
+<%- include('../partials/footer') %>

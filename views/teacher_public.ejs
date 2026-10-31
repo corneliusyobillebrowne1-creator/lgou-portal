@@ -1,0 +1,22 @@
+<%- include('partials/header') %>
+<main><div class="wrap">
+  <p><a href="/teachers">&larr; All teachers</a></p>
+  <div class="card teachercard">
+    <div class="avatar big"><%= initials(t.full_name) %></div>
+    <div>
+      <h1><%= t.full_name %></h1>
+      <p><strong><%= t.headline %></strong></p>
+      <p class="meta"><%= t.county %> &middot; <%= t.experience_years %> years of experience &middot; Subjects: <%= t.subjects %></p>
+    </div>
+  </div>
+  <div class="card flat">
+    <h3>About</h3><p class="pre"><%= t.bio %></p>
+    <h3>Qualifications</h3><p class="pre"><%= t.qualifications %></p>
+  </div>
+  <h2>Courses by <%= t.full_name %></h2>
+  <% if (!courses.length) { %><p class="muted">No courses are open for enrolment right now.</p><% } %>
+  <div class="grid">
+    <% courses.forEach(c => { %><%- include('partials/course_card', { c }) %><% }) %>
+  </div>
+</div></main>
+<%- include('partials/footer') %>

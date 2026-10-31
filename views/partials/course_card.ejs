@@ -1,0 +1,13 @@
+<article class="card">
+  <span class="badge <%= c.type === 'diploma' ? 'diploma' : '' %>"><%= c.type %></span>
+  <% if (c.live) { %><span class="badge ok">Live classes</span><% } %>
+  <h3><%= c.title %></h3>
+  <p><%= c.summary %></p>
+  <p class="meta">
+    <%= c.duration_weeks %> weeks
+    <% if (c.lesson_count) { %>&middot; <%= c.lesson_count %> video lessons<% } %>
+    <% if (c.teacher_name) { %><br>Taught by <%= c.teacher_name %><% } %>
+  </p>
+  <div class="price"><%= money(c.fee_cents) %></div>
+  <a class="btn" href="/courses/<%= c.id %>">View course</a>
+</article>

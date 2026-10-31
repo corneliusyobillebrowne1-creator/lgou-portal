@@ -1,0 +1,16 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <%- include('_tabs') %>
+  <h2>List: <%= group.name %></h2>
+  <p class="muted">Tick the students who belong in this list. Only students who have paid their fee can be added.</p>
+  <% if (!students.length) { %><div class="card flat"><p>No paid students yet.</p></div><% } else { %>
+  <form method="post" action="/teacher/courses/<%= course.id %>/groups/<%= group.id %>" class="card">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <% students.forEach(s => { %>
+      <label class="check"><input type="checkbox" name="enr" value="<%= s.id %>" <%= members.has(s.id) ? 'checked' : '' %>> <%= s.student_name %> <span class="muted">(<%= s.username %>)</span></label>
+    <% }) %>
+    <p><button class="btn" type="submit">Save list</button> <a class="btn ghost" href="/teacher/courses/<%= course.id %>/students">Cancel</a></p>
+  </form>
+  <% } %>
+</div></main>
+<%- include('../partials/footer') %>

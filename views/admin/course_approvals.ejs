@@ -1,0 +1,24 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <h1>Course approvals</h1>
+  <p class="muted">Courses created by teachers wait here. Check the title, description, fee and Google Classroom link before approving. Approved courses appear on the website.</p>
+  <% if (!courses.length) { %><div class="card flat"><p>No courses are waiting for approval.</p></div><% } %>
+  <% courses.forEach(c => { %>
+    <div class="card">
+      <h3><%= c.title %> <span class="badge <%= c.type === 'diploma' ? 'diploma' : '' %>"><%= c.type %></span></h3>
+      <p class="meta">By <a href="/admin/teachers/<%= c.teacher_id %>"><%= c.teacher_name %></a> &middot; Fee <%= money(c.fee_cents) %> &middot; <%= c.duration_weeks %> weeks &middot; Pass mark <%= c.pass_mark %>%</p>
+      <p><%= c.summary %></p>
+      <p class="pre"><%= c.description %></p>
+      <p>Classroom link: <a href="<%= c.classroom_url %>" target="_blank" rel="noopener noreferrer"><%= c.classroom_url %></a></p>
+      <form method="post" action="/admin/courses/<%= c.id %>/approval">
+        <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+        <label>Note to teacher (required when rejecting)</label><input type="text" name="note" maxlength="300">
+        <p class="actions">
+          <button class="btn ok" type="submit" name="decision" value="approved">Approve</button>
+          <button class="btn red" type="submit" name="decision" value="rejected">Reject</button>
+        </p>
+      </form>
+    </div>
+  <% }) %>
+</div></main>
+<%- include('../partials/footer') %>

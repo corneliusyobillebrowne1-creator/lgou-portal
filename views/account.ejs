@@ -1,0 +1,17 @@
+<%- include('partials/header') %>
+<main><div class="wrap"><div class="card formcard">
+  <h1>Change password</h1>
+  <p class="muted">Signed in as <strong><%= user.username %></strong></p>
+  <% if (error) { %><div class="alert err"><%= error %></div><% } %>
+  <form method="post" action="/account">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label for="current">Current password</label>
+    <input type="password" id="current" name="current" required autocomplete="current-password">
+    <label for="password">New password (8+ characters, with a letter and a number)</label>
+    <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password">
+    <label for="confirm">Confirm new password</label>
+    <input type="password" id="confirm" name="confirm" required minlength="8" autocomplete="new-password">
+    <p><button class="btn" type="submit">Change password</button></p>
+  </form>
+</div></div></main>
+<%- include('partials/footer') %>

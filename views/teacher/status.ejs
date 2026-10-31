@@ -1,0 +1,21 @@
+<%- include('../partials/header') %>
+<main><div class="wrap"><div class="card formcard wide">
+  <h1>Teacher application</h1>
+  <% if (!tp) { %>
+    <div class="alert err">No teacher profile was found for this account. Please contact the school office.</div>
+  <% } else if (tp.status === 'pending') { %>
+    <p><span class="badge warn">Under review</span></p>
+    <p>Thank you for applying, <strong><%= user.full_name %></strong>. The admin team is reviewing your application. You will see the result on this page when you log in again. Teacher tools are unlocked only after approval.</p>
+  <% } else if (tp.status === 'rejected') { %>
+    <p><span class="badge bad">Not approved</span></p>
+    <p>Your application was not approved.</p>
+    <% if (tp.admin_note) { %><div class="alert warn">Note from the admin team: <%= tp.admin_note %></div><% } %>
+    <p class="muted">If you think this is a mistake, please contact the school office.</p>
+  <% } else if (tp.status === 'suspended') { %>
+    <p><span class="badge bad">Suspended</span></p>
+    <p>Your teacher access is currently suspended and your courses are hidden from students.</p>
+    <% if (tp.admin_note) { %><div class="alert warn">Note from the admin team: <%= tp.admin_note %></div><% } %>
+  <% } %>
+  <p><a class="btn ghost" href="/account">Change password</a></p>
+</div></div></main>
+<%- include('../partials/footer') %>

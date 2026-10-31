@@ -1,0 +1,30 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <h1>Approve completed studies</h1>
+  <p class="muted">Students appear here after finishing every lesson and requesting a certificate. Enter the student's final exam score, then approve to issue the certificate.</p>
+  <% if (!pending.length) { %><div class="card flat"><p>No certificate requests waiting.</p></div><% } %>
+  <% pending.forEach(e => { %>
+    <div class="card">
+      <h3><%= e.full_name %> <span class="muted">(<%= e.username %>)</span></h3>
+      <p><%= e.course_title %> <span class="badge <%= e.course_type === 'diploma' ? 'diploma' : '' %>"><%= e.course_type %></span><br>
+      <% if (e.teacher_id) { %><% if (e.completion_recommended) { %><span class="badge ok">teacher recommended (<%= e.recommended_score %>%)</span><% } else { %><span class="badge bad">not recommended by teacher</span><% } %><% } else { %>Lessons <%= e.lesson_done %>/<%= e.lesson_total %><% } %>
+      &middot; Fee <%= money(e.fee_cents) %>, paid <%= money(e.paid_cents) %>
+      <% if (e.owed_cents > 0) { %><span class="badge bad">balance <%= money(e.owed_cents) %></span><% } else { %><span class="badge ok">fully paid</span><% } %></p>
+      <div class="row">
+        <form method="post" action="/admin/approvals/<%= e.id %>/approve" class="card flat">
+          <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+          <label>Final exam score (%) &mdash; pass mark <%= e.pass_mark %>%</label>
+          <input type="number" name="score" min="0" max="100" required value="<%= e.recommended_score === null || e.recommended_score === undefined ? '' : e.recommended_score %>">
+          <p><button class="btn ok" type="submit">Approve &amp; issue certificate</button></p>
+        </form>
+        <form method="post" action="/admin/approvals/<%= e.id %>/reject" class="card flat">
+          <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+          <label>Reason (shown to the student)</label>
+          <input type="text" name="note" maxlength="300" placeholder="e.g. Please retake the final assessment">
+          <p><button class="btn red" type="submit">Reject</button></p>
+        </form>
+      </div>
+    </div>
+  <% }) %>
+</div></main>
+<%- include('../partials/footer') %>

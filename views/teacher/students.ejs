@@ -1,0 +1,57 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <%- include('_tabs') %>
+  <p class="muted">Students appear here once they enroll. Names are shown for class use only; payment details stay with the school office. Attendance and grade averages update as you record them.</p>
+  <% if (!students.length) { %><div class="card flat"><p>No students have enrolled yet.</p></div><% } else { %>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Student</th><th>Fee</th><th>Attendance</th><th>Grade avg</th><th>Lists</th><th>Certificate</th></tr></thead>
+    <tbody>
+    <% students.forEach(s => { %>
+      <tr>
+        <td><strong><%= s.student_name %></strong><br><span class="muted"><%= s.username %></span></td>
+        <td><% if (s.paid_full) { %><span class="badge ok">paid</span><% } else if (s.pending_cents > 0) { %><span class="badge warn">awaiting confirmation</span><% } else { %><span class="badge bad">unpaid</span><% } %></td>
+        <td><%= s.stats.att_pct === null ? '-' : s.stats.att_pct + '%' %> <span class="muted">(<%= s.stats.att_sessions %> sessions)</span></td>
+        <td><%= s.stats.grade_pct === null ? '-' : s.stats.grade_pct + '%' %> <span class="muted">(<%= s.stats.graded %> graded)</span></td>
+        <td><%= s.lists.length ? s.lists.join(', ') : '-' %></td>
+        <td>
+          <% if (s.status === 'certified') { %><span class="badge ok">certified</span>
+          <% } else if (s.status === 'requested') { %><span class="badge warn">requested</span>
+          <% } else if (!s.paid_full) { %><span class="muted">-</span>
+          <% } else if (s.completion_recommended) { %>
+            <span class="badge ok">recommended (<%= s.recommended_score %>%)</span>
+            <form method="post" action="/teacher/courses/<%= course.id %>/recommend/<%= s.id %>" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><input type="hidden" name="action" value="withdraw"><button class="btn small ghost" type="submit">Withdraw</button></form>
+          <% } else { %>
+            <form method="post" action="/teacher/courses/<%= course.id %>/recommend/<%= s.id %>" class="inline recform"><input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+              <input type="number" class="score" name="score" min="0" max="100" required placeholder="final %" value="<%= s.stats.grade_pct === null ? '' : Math.round(s.stats.grade_pct) %>">
+              <button class="btn small" type="submit">Recommend</button></form>
+          <% } %>
+        </td>
+      </tr>
+    <% }) %>
+    </tbody>
+  </table></div>
+  <p class="muted">"Recommend" tells the admin team the student has completed your course with that final score. The student can then request the certificate and the admin team gives the final approval.</p>
+  <% } %>
+
+  <h2>Student lists</h2>
+  <p class="muted">Make lists such as "Morning class" or "Group A" and use them to filter the attendance sheet.</p>
+  <% if (groups.length) { %>
+  <div class="tablewrap"><table>
+    <thead><tr><th>List</th><th>Students</th><th></th></tr></thead>
+    <tbody>
+    <% groups.forEach(g => { %>
+      <tr><td><%= g.name %></td><td><%= g.n %></td><td><div class="actions">
+        <a class="btn small" href="/teacher/courses/<%= course.id %>/groups/<%= g.id %>">Choose students</a>
+        <form method="post" action="/teacher/courses/<%= course.id %>/groups/<%= g.id %>/delete" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn small red" type="submit">Delete</button></form>
+      </div></td></tr>
+    <% }) %>
+    </tbody>
+  </table></div>
+  <% } %>
+  <form method="post" action="/teacher/courses/<%= course.id %>/groups" class="card flat">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label>New list name</label>
+    <div class="row"><input type="text" name="name" required minlength="2" maxlength="40" placeholder="e.g. Morning class"><span><button class="btn" type="submit">Create list</button></span></div>
+  </form>
+</div></main>
+<%- include('../partials/footer') %>

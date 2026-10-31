@@ -1,0 +1,58 @@
+<%- include('partials/header') %>
+<main><div class="wrap">
+  <h1>Teach with Liberia Gateway Online University</h1>
+  <div class="card">
+    <p>We welcome teachers from every county in Liberia. You teach live in <strong>your own Google Classroom</strong>; this portal handles student registration, fees, attendance, grades and certificates for you.</p>
+    <ol>
+      <li><strong>Apply</strong> using the form below. You get a teacher account straight away, but it only shows an application-status page until approved.</li>
+      <li><strong>Admin review:</strong> our team reads every application and approves or declines it, with a note.</li>
+      <li><strong>Create courses</strong> with a small fee (set by you, within the school's fee limit) and your Google Classroom link. Each course is reviewed before it goes live on the website.</li>
+      <li><strong>Teach and track:</strong> students pay and enroll, then join your Classroom. Mark attendance, assign grades and recommend finishing students for their certificate.</li>
+    </ol>
+    <p class="muted">You will need a Google account and the ability to create classes in Google Classroom. The portal does not run video calls or quizzes; those stay in Classroom.</p>
+  </div>
+
+  <% if (user) { %>
+    <div class="alert warn">You are logged in as <strong><%= user.username %></strong>. To apply as a teacher, log out and create a separate teacher account.</div>
+  <% } else { %>
+  <div class="card formcard wide">
+    <h2>Teacher application</h2>
+    <% if (error) { %><div class="alert err"><%= error %></div><% } %>
+    <form method="post" action="/teach" autocomplete="off">
+      <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+      <div class="row">
+        <div><label for="full_name">Full name</label><input type="text" id="full_name" name="full_name" required maxlength="80" value="<%= form.full_name || '' %>"></div>
+        <div><label for="county">County where you live</label>
+          <select id="county" name="county" required>
+            <option value="">Choose...</option>
+            <% counties.forEach(c => { %><option <%= form.county === c ? 'selected' : '' %>><%= c %></option><% }) %>
+          </select></div>
+      </div>
+      <div class="row">
+        <div><label for="username">Username</label><input type="text" id="username" name="username" required minlength="3" maxlength="30" value="<%= form.username || '' %>" autocapitalize="none"></div>
+        <div><label for="email">Email</label><input type="email" id="email" name="email" required maxlength="120" value="<%= form.email || '' %>"></div>
+        <div><label for="phone">Phone (optional)</label><input type="tel" id="phone" name="phone" maxlength="20" value="<%= form.phone || '' %>"></div>
+      </div>
+      <label for="headline">Headline shown on your profile</label>
+      <input type="text" id="headline" name="headline" required maxlength="100" placeholder="e.g. Secondary school mathematics teacher" value="<%= form.headline || '' %>">
+      <div class="row">
+        <div><label for="subjects">Subjects you want to teach</label><input type="text" id="subjects" name="subjects" required maxlength="150" value="<%= form.subjects || '' %>"></div>
+        <div><label for="experience_years">Years of teaching experience</label><input type="number" id="experience_years" name="experience_years" min="0" max="60" required value="<%= Number.isNaN(form.experience_years) || form.experience_years === undefined ? '' : form.experience_years %>"></div>
+      </div>
+      <label for="qualifications">Qualifications (degrees, certificates, schools where you taught)</label>
+      <textarea id="qualifications" name="qualifications" required maxlength="800"><%= form.qualifications || '' %></textarea>
+      <label for="bio">Short bio (shown publicly if you are approved)</label>
+      <textarea id="bio" name="bio" required maxlength="1200"><%= form.bio || '' %></textarea>
+      <div class="row">
+        <div><label for="password">Password (8+ characters, with a letter and a number)</label><input type="password" id="password" name="password" required minlength="8" autocomplete="new-password"></div>
+        <div><label for="confirm">Confirm password</label><input type="password" id="confirm" name="confirm" required minlength="8" autocomplete="new-password"></div>
+      </div>
+      <label class="check"><input type="checkbox" name="has_classroom" value="1" required> I have a Google account and can create and manage classes in Google Classroom.</label>
+      <label class="check"><input type="checkbox" name="consent" value="1" required> I agree that my name, headline, county, subjects, bio and qualifications will be shown publicly if I am approved. My email and phone are never shown.</label>
+      <p><button class="btn red" type="submit">Submit application</button></p>
+    </form>
+    <p class="muted">Already applied? <a href="/login">Log in</a> to see your status.</p>
+  </div>
+  <% } %>
+</div></main>
+<%- include('partials/footer') %>

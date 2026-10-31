@@ -1,0 +1,49 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <%- include('_tabs') %>
+  <p class="muted">Run your live quizzes and assignments in Google Classroom, then record each student's mark here so it appears in their portal and in their progress record.</p>
+
+  <form method="post" action="/teacher/courses/<%= course.id %>/grade-items" class="card flat">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <strong>Add a quiz, assignment or exam</strong>
+    <div class="row">
+      <div><label>Title</label><input type="text" name="title" required maxlength="100" placeholder="e.g. Quiz 1"></div>
+      <div><label>Type</label><select name="category"><option value="quiz">Quiz</option><option value="assignment">Assignment</option><option value="exam">Exam</option><option value="participation">Participation</option></select></div>
+      <div><label>Out of (max score)</label><input type="text" name="max_score" required inputmode="decimal" value="100"></div>
+      <span><button class="btn" type="submit">Add</button></span>
+    </div>
+  </form>
+
+  <h2>Gradebook</h2>
+  <% if (!items.length) { %><div class="card flat"><p>Add your first quiz or assignment above.</p></div>
+  <% } else if (!students.length) { %><div class="card flat"><p>No paid students yet. Marks can only be entered for students whose fee is confirmed.</p></div>
+  <% } else { %>
+  <form method="post" action="/teacher/courses/<%= course.id %>/grades">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <div class="tablewrap"><table>
+      <thead><tr><th>Student</th>
+        <% items.forEach(i => { %><th><%= i.title %><br><span class="muted">/ <%= i.max_score %> &middot; <%= i.category %></span></th><% }) %>
+        <th>Average</th></tr></thead>
+      <tbody>
+      <% students.forEach(s => { %>
+        <tr><td><%= s.student_name %></td>
+        <% items.forEach(i => { const v = scores.get(i.id + '_' + s.id); %>
+          <td><input type="text" class="score" inputmode="decimal" name="s_<%= i.id %>_<%= s.id %>" value="<%= v === undefined ? '' : v %>" aria-label="<%= s.student_name %> - <%= i.title %>"></td>
+        <% }) %>
+        <td><%= s.stats.grade_pct === null ? '-' : s.stats.grade_pct + '%' %></td></tr>
+      <% }) %>
+      </tbody>
+    </table></div>
+    <p class="muted">Leave a box empty if the student has no mark yet. Nothing is saved if any mark is invalid or above the maximum.</p>
+    <p><button class="btn" type="submit">Save all grades</button></p>
+  </form>
+
+  <h3>Remove a column</h3>
+  <div class="actions">
+    <% items.forEach(i => { %>
+      <form method="post" action="/teacher/courses/<%= course.id %>/grade-items/<%= i.id %>/delete" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn small ghost" type="submit">Delete "<%= i.title %>"</button></form>
+    <% }) %>
+  </div>
+  <% } %>
+</div></main>
+<%- include('../partials/footer') %>

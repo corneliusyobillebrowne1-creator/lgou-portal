@@ -1,0 +1,15 @@
+<%- include('partials/header') %>
+<main><div class="wrap"><div class="card formcard">
+  <h1>Log in</h1>
+  <% if (error) { %><div class="alert err"><%= error %></div><% } %>
+  <form method="post" action="/login">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" required value="<%= username %>" autocapitalize="none" autocomplete="username">
+    <label for="password">Password</label>
+    <input type="password" id="password" name="password" required autocomplete="current-password">
+    <p><button class="btn" type="submit">Log in</button></p>
+  </form>
+  <p class="muted">New student? <a href="/signup">Create an account</a>. Forgot your password? Contact the school office to have it reset.</p>
+</div></div></main>
+<%- include('partials/footer') %>

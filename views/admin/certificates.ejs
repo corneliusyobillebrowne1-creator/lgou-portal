@@ -1,0 +1,24 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <h1>Issued certificates</h1>
+  <% if (!certs.length) { %><div class="card flat"><p>No certificates issued yet.</p></div><% } else { %>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Certificate no.</th><th>Student</th><th>Course</th><th>Score</th><th>Issued</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    <% certs.forEach(c => { %>
+      <tr>
+        <td><%= c.cert_no %><br><span class="muted">code <%= c.verify_code %></span></td>
+        <td><%= c.student_name %></td><td><%= c.course_title %></td><td><%= c.score === null ? '-' : c.score + '%' %></td>
+        <td><%= fmtDate(c.issued_at) %></td>
+        <td><span class="badge <%= c.status === 'valid' ? 'ok' : 'bad' %>"><%= c.status %></span></td>
+        <td><div class="actions">
+          <a class="btn small" href="/admin/certificates/<%= c.id %>">View / print</a>
+          <form method="post" action="/admin/certificates/<%= c.id %>/toggle" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn small ghost" type="submit"><%= c.status === 'valid' ? 'Revoke' : 'Restore' %></button></form>
+        </div></td>
+      </tr>
+    <% }) %>
+    </tbody>
+  </table></div>
+  <% } %>
+</div></main>
+<%- include('../partials/footer') %>

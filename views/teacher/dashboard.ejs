@@ -1,0 +1,36 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <h1>Welcome, <%= user.full_name %></h1>
+  <div class="stats">
+    <div class="stat"><b><%= totals.courses %></b><span>My courses</span></div>
+    <div class="stat"><b><%= totals.students %></b><span>Active students (fee paid)</span></div>
+    <div class="stat"><b><%= totals.awaiting %></b><span>Enrolled, fee not yet confirmed</span></div>
+    <div class="stat <%= totals.pending ? 'alertish' : '' %>"><b><%= totals.pending %></b><span>Courses awaiting approval</span></div>
+  </div>
+
+  <h2>My courses</h2>
+  <% if (!courses.length) { %>
+    <div class="card flat"><p>You have not created a course yet. <a href="/teacher/courses">Create your first course</a> with your Google Classroom link.</p></div>
+  <% } else { %>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Course</th><th>Fee</th><th>Status</th><th>Active students</th><th></th></tr></thead>
+    <tbody>
+    <% courses.forEach(c => { %>
+      <tr>
+        <td><%= c.title %></td><td><%= money(c.fee_cents) %></td>
+        <td><span class="badge <%= c.approval_status === 'approved' ? 'ok' : c.approval_status === 'pending' ? 'warn' : 'bad' %>"><%= c.approval_status %></span></td>
+        <td><%= c.active_students %> <span class="muted">(+<%= c.enrolled - c.active_students %> unpaid)</span></td>
+        <td><div class="actions">
+          <a class="btn small" href="/teacher/courses/<%= c.id %>/students">Students</a>
+          <a class="btn small ghost" href="/teacher/courses/<%= c.id %>/attendance">Attendance</a>
+          <a class="btn small ghost" href="/teacher/courses/<%= c.id %>/grades">Grades</a>
+          <a class="btn small ghost" href="/teacher/courses/<%= c.id %>">Edit</a>
+        </div></td>
+      </tr>
+    <% }) %>
+    </tbody>
+  </table></div>
+  <% } %>
+  <p class="muted">Live lessons, quizzes and assignments happen in your Google Classroom. Use this dashboard for student lists, attendance, grades and progress.</p>
+</div></main>
+<%- include('../partials/footer') %>

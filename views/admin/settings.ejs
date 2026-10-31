@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <h1>Settings &amp; backups</h1>
+
+  <h2>Payment instructions shown to students</h2>
+  <form method="post" action="/admin/settings" class="card">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label for="instructions">Tell students where to send their fees (mobile money numbers, bank details, office address)</label>
+    <textarea id="instructions" name="instructions" maxlength="2000"><%= instructions %></textarea>
+    <label for="max_fee">Maximum fee a teacher may charge for one course (USD)</label>
+    <input type="text" id="max_fee" name="max_fee" inputmode="decimal" value="<%= maxFee %>">
+    <p><button class="btn" type="submit">Save</button></p>
+  </form>
+
+  <h2>Database backups</h2>
+  <div class="card">
+    <p>A backup is created automatically every 24 hours (newest 14 are kept in the <code>backups</code> folder). You can also make one now.</p>
+    <form method="post" action="/admin/backup"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn" type="submit">Back up now</button></form>
+    <p class="muted">Copy backup files off this server regularly (cloud storage, external drive). Personal data inside is encrypted, so also keep a copy of the encryption key (<code>data/.enc.key</code> or your <code>ENCRYPTION_KEY</code>) in a separate safe place &mdash; without it a backup cannot be restored to readable data.</p>
+    <% if (!backups.length) { %><p>No backups yet.</p><% } else { %>
+    <div class="tablewrap"><table>
+      <thead><tr><th>File</th><th>Created</th><th>Size</th></tr></thead>
+      <tbody><% backups.forEach(b => { %><tr><td><%= b.name %></td><td><%= b.mtime.toISOString().replace('T', ' ').slice(0, 19) %> UTC</td><td><%= Math.round(b.size / 1024) %> KB</td></tr><% }) %></tbody>
+    </table></div>
+    <% } %>
+  </div>
+</div></main>
+<%- include('../partials/footer') %>

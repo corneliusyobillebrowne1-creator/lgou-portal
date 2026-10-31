@@ -1,0 +1,35 @@
+# Render "Blueprint": Render reads this file and creates the whole site for you (server + permanent storage + secret keys).
+# Free instances cannot keep permanent files, so this uses a small paid instance with a 1 GB disk for the database.
+services:
+  - type: web
+    name: lgou-portal
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /
+    disk:
+      name: lgou-data
+      mountPath: /var/data
+      sizeGB: 1
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: NODE_ENV
+        value: production
+      - key: COOKIE_SECURE
+        value: "true"
+      - key: TRUST_PROXY
+        value: "1"
+      - key: DATA_DIR
+        value: /var/data/db
+      - key: BACKUP_DIR
+        value: /var/data/backups
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: ADMIN_USERNAME
+        value: admin
+      - key: ADMIN_PASSWORD
+        sync: false   # Render asks you to type this once when you create the site

@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+<main><div class="wrap"><div class="card formcard">
+  <h1>Verify a certificate</h1>
+  <p>Enter the verification code printed at the bottom of the certificate.</p>
+  <form method="get" action="/verify">
+    <label for="code">Verification code</label>
+    <input type="text" id="code" name="code" value="<%= code %>" maxlength="32" required autocomplete="off">
+    <p><button class="btn" type="submit">Verify</button></p>
+  </form>
+  <% if (result && result.found && result.cert.status === 'valid') { %>
+    <div class="alert ok"><strong>Valid certificate.</strong> This was issued by Liberia Gateway Online University.</div>
+    <table><tbody>
+      <tr><th>Awarded to</th><td><%= result.cert.student_name %></td></tr>
+      <tr><th>Programme</th><td><%= result.cert.course_title %> (<%= result.cert.course_type %>)</td></tr>
+      <tr><th>Certificate no.</th><td><%= result.cert.cert_no %></td></tr>
+      <tr><th>Date issued</th><td><%= fmtDate(result.cert.issued_at) %></td></tr>
+    </tbody></table>
+  <% } else if (result && result.found) { %>
+    <div class="alert err"><strong>This certificate has been revoked</strong> and is no longer valid.</div>
+  <% } else if (result) { %>
+    <div class="alert err">No certificate was found with that code. Check the code and try again.</div>
+  <% } %>
+</div></div></main>
+<%- include('partials/footer') %>

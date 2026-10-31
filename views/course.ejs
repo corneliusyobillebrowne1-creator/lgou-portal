@@ -1,0 +1,28 @@
+<%- include('partials/header') %>
+<main><div class="wrap">
+  <p><a href="/#courses">&larr; All courses</a></p>
+  <div class="card">
+    <span class="badge <%= course.type === 'diploma' ? 'diploma' : '' %>"><%= course.type %></span>
+    <% if (course.live) { %><span class="badge ok">Live classes in Google Classroom</span><% } %>
+    <h1><%= course.title %></h1>
+    <p class="meta"><%= course.duration_weeks %> weeks<% if (lessons.length) { %> &middot; <%= lessons.length %> video lessons<% } %> &middot; Pass mark <%= course.pass_mark %>%
+      <% if (course.teacher_name) { %> &middot; Taught by <a href="/teachers/<%= course.teacher_id %>"><%= course.teacher_name %></a><% } %></p>
+    <div class="price"><%= money(course.fee_cents) %></div>
+    <p class="pre"><%= course.description || course.summary %></p>
+    <% if (course.live) { %><p class="muted">After your fee is confirmed, a button in your student portal opens this course's Google Classroom for live lessons, quizzes and assignments.</p><% } %>
+
+    <% if (user && user.role === 'student') { %>
+      <form method="post" action="/portal/enroll/<%= course.id %>"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn red" type="submit">Enroll in this course</button></form>
+    <% } else if (!user) { %>
+      <a class="btn red" href="/signup">Sign up to enroll</a> <a class="btn ghost" href="/login">I already have an account</a>
+    <% } %>
+  </div>
+
+  <% if (lessons.length) { %>
+  <h2>Video lessons</h2>
+  <div class="card flat"><ol>
+    <% lessons.forEach(l => { %><li><%= l.title %></li><% }) %>
+  </ol></div>
+  <% } %>
+</div></main>
+<%- include('partials/footer') %>

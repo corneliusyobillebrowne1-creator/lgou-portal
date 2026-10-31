@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <%- include('_tabs') %>
+  <form method="post" action="/teacher/courses/<%= course.id %>/attendance" class="card flat">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <strong>Start a new attendance sheet for a class session</strong>
+    <div class="row">
+      <div><label>Date</label><input type="date" name="session_date" required value="<%= today %>"></div>
+      <div><label>Topic (optional)</label><input type="text" name="topic" maxlength="120" placeholder="e.g. Week 3 - Spreadsheets"></div>
+      <span><button class="btn" type="submit">Create &amp; mark attendance</button></span>
+    </div>
+  </form>
+
+  <h2>Class sessions</h2>
+  <% if (!sessions.length) { %><div class="card flat"><p>No sessions yet.</p></div><% } else { %>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Date</th><th>Topic</th><th>Marked</th><th>Present / late</th><th></th></tr></thead>
+    <tbody>
+    <% sessions.forEach(s => { %>
+      <tr><td><%= s.session_date %></td><td><%= s.topic || '-' %></td><td><%= s.marked %></td><td><%= s.here %></td>
+      <td><div class="actions"><a class="btn small" href="/teacher/courses/<%= course.id %>/attendance/<%= s.id %>">Open sheet</a>
+        <form method="post" action="/teacher/courses/<%= course.id %>/attendance/<%= s.id %>/delete" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn small red" type="submit">Delete</button></form></div></td></tr>
+    <% }) %>
+    </tbody>
+  </table></div>
+  <% } %>
+</div></main>
+<%- include('../partials/footer') %>

@@ -1,0 +1,17 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <%- include('_tabs') %>
+  <% if (course.approval_status === 'pending') { %><div class="alert warn">Waiting for the admin team to approve this course. It is not yet visible to students.</div><% } %>
+  <% if (course.approval_status === 'rejected') { %>
+    <div class="alert err">This course was not approved.<% if (course.admin_note) { %> Reason: <%= course.admin_note %><% } %> Fix the details below, then resubmit.
+      <form method="post" action="/teacher/courses/<%= course.id %>/resubmit" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn small" type="submit">Resubmit for approval</button></form></div>
+  <% } %>
+  <% if (course.approval_status === 'suspended') { %><div class="alert err">This course has been suspended by the admin team and is hidden from students.<% if (course.admin_note) { %> Reason: <%= course.admin_note %><% } %></div><% } %>
+
+  <form method="post" action="/teacher/courses/<%= course.id %>" class="card">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <%- include('course_fields', { c: course }) %>
+    <p><button class="btn" type="submit">Save changes</button></p>
+  </form>
+</div></main>
+<%- include('../partials/footer') %>

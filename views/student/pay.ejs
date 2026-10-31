@@ -1,0 +1,49 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <p><a href="/portal">&larr; My portal</a></p>
+  <h1>Pay fee: <%= e.course_title %></h1>
+  <div class="stats">
+    <div class="stat"><b><%= money(e.fee_cents) %></b><span>Course fee</span></div>
+    <div class="stat"><b><%= money(e.paid_cents) %></b><span>Confirmed paid</span></div>
+    <div class="stat"><b><%= money(e.pending_cents) %></b><span>Awaiting confirmation</span></div>
+    <div class="stat alertish"><b><%= money(e.owed_cents) %></b><span>Balance owed</span></div>
+  </div>
+
+  <% if (e.paid_full) { %>
+    <div class="alert ok">Your fee is fully paid. <a href="/portal/learn/<%= e.id %>">Start learning &rarr;</a></div>
+  <% } else { %>
+    <div class="card">
+      <h3>How to pay</h3>
+      <p class="pre"><%= instructions %></p>
+      <% if (error) { %><div class="alert err"><%= error %></div><% } %>
+      <form method="post" action="/portal/pay/<%= e.id %>">
+        <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+        <div class="row">
+          <div><label for="amount">Amount paid (USD)</label>
+          <input type="text" id="amount" name="amount" inputmode="decimal" required value="<%= (e.owed_cents / 100).toFixed(2) %>"></div>
+          <div><label for="method">Payment method</label>
+          <select id="method" name="method" required>
+            <% methods.forEach(m => { %><option><%= m %></option><% }) %>
+          </select></div>
+        </div>
+        <label for="reference">Transaction reference / receipt number</label>
+        <input type="text" id="reference" name="reference" required minlength="4" maxlength="60" autocomplete="off">
+        <p><button class="btn" type="submit">Submit payment for confirmation</button></p>
+      </form>
+    </div>
+  <% } %>
+
+  <h2>Payment history</h2>
+  <% if (!payments.length) { %><p class="muted">No payments submitted yet.</p><% } else { %>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Reference</th><th>Status</th></tr></thead>
+    <tbody>
+    <% payments.forEach(p => { %>
+      <tr><td><%= fmtDate(p.created_at) %></td><td><%= money(p.amount_cents) %></td><td><%= p.method %></td><td><%= p.reference %></td>
+      <td><span class="badge <%= p.status === 'confirmed' ? 'ok' : p.status === 'rejected' ? 'bad' : 'warn' %>"><%= p.status %></span></td></tr>
+    <% }) %>
+    </tbody>
+  </table></div>
+  <% } %>
+</div></main>
+<%- include('../partials/footer') %>

@@ -1,0 +1,23 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <h1>Students</h1>
+  <form method="get" action="/admin/students" class="row">
+    <input type="text" name="q" value="<%= q %>" placeholder="Search name, username, email or phone">
+    <span><button class="btn" type="submit">Search</button></span>
+  </form>
+  <p class="muted"><%= students.length %> student(s)</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Name</th><th>Username</th><th>Email</th><th>Phone</th><th>Courses</th><th>Fees owed</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    <% students.forEach(s => { %>
+      <tr>
+        <td><%= s.full_name %></td><td><%= s.username %></td><td><%= s.email %></td><td><%= s.phone %></td>
+        <td><%= s.enrolled %></td><td><%= money(s.owed_cents) %></td>
+        <td><span class="badge <%= s.active ? 'ok' : 'bad' %>"><%= s.active ? 'active' : 'disabled' %></span></td>
+        <td><a class="btn small" href="/admin/students/<%= s.id %>">Open</a></td>
+      </tr>
+    <% }) %>
+    </tbody>
+  </table></div>
+</div></main>
+<%- include('../partials/footer') %>

@@ -1,0 +1,61 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <p><a href="/admin/students">&larr; All students</a></p>
+  <h1><%= s.full_name %></h1>
+  <div class="card">
+    <div class="row">
+      <div><span class="muted">Username</span><br><strong><%= s.username %></strong></div>
+      <div><span class="muted">Email</span><br><strong><%= s.email %></strong></div>
+      <div><span class="muted">Phone</span><br><strong><%= s.phone || '-' %></strong></div>
+      <div><span class="muted">Registered</span><br><strong><%= fmtDate(s.created_at) %></strong></div>
+      <div><span class="muted">Last login</span><br><strong><%= s.last_login ? s.last_login + ' UTC' : 'never' %></strong></div>
+    </div>
+    <div class="actions">
+      <form method="post" action="/admin/students/<%= s.id %>/toggle" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn small <%= s.active ? 'red' : 'ok' %>" type="submit"><%= s.active ? 'Disable account' : 'Enable account' %></button></form>
+      <form method="post" action="/admin/students/<%= s.id %>/reset-password" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn small ghost" type="submit">Reset password</button></form>
+    </div>
+  </div>
+
+  <h2>Enrollments &amp; fees</h2>
+  <% if (!enrollments.length) { %><p class="muted">Not enrolled in any course.</p><% } %>
+  <% enrollments.forEach(e => { %>
+    <div class="card">
+      <h3><%= e.course_title %> <span class="badge <%= e.course_type === 'diploma' ? 'diploma' : '' %>"><%= e.course_type %></span></h3>
+      <p>Fee <strong><%= money(e.fee_cents) %></strong> &middot; Paid <strong><%= money(e.paid_cents) %></strong> &middot;
+        Owed <strong><%= money(e.owed_cents) %></strong> &middot; Progress <progress value="<%= e.percent %>" max="100"></progress> <%= e.percent %>% &middot;
+        Status <span class="badge <%= e.status === 'certified' ? 'ok' : e.status === 'requested' ? 'warn' : '' %>"><%= e.status %></span></p>
+      <div class="row">
+        <form method="post" action="/admin/enrollments/<%= e.id %>/payment" class="card flat">
+          <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+          <strong>Record a payment (confirmed immediately)</strong>
+          <div class="row">
+            <div><label>Amount (USD)</label><input type="text" name="amount" required inputmode="decimal"></div>
+            <div><label>Method</label><select name="method"><% methods.forEach(m => { %><option><%= m %></option><% }) %></select></div>
+          </div>
+          <label>Reference / receipt no.</label><input type="text" name="reference" maxlength="60">
+          <p><button class="btn small" type="submit">Record payment</button></p>
+        </form>
+        <form method="post" action="/admin/enrollments/<%= e.id %>/fee" class="card flat">
+          <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+          <strong>Adjust this student's fee (discount / scholarship)</strong>
+          <label>Fee (USD)</label><input type="text" name="fee" required inputmode="decimal" value="<%= (e.fee_cents / 100).toFixed(2) %>">
+          <p><button class="btn small ghost" type="submit">Update fee</button></p>
+        </form>
+      </div>
+    </div>
+  <% }) %>
+
+  <h2>Payment history</h2>
+  <% if (!payments.length) { %><p class="muted">No payments yet.</p><% } else { %>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Date</th><th>Course</th><th>Amount</th><th>Method</th><th>Reference</th><th>Status</th></tr></thead>
+    <tbody>
+    <% payments.forEach(p => { %>
+      <tr><td><%= fmtDate(p.created_at) %></td><td><%= p.course_title %></td><td><%= money(p.amount_cents) %></td><td><%= p.method %></td><td><%= p.reference %></td>
+      <td><span class="badge <%= p.status === 'confirmed' ? 'ok' : p.status === 'rejected' ? 'bad' : 'warn' %>"><%= p.status %></span></td></tr>
+    <% }) %>
+    </tbody>
+  </table></div>
+  <% } %>
+</div></main>
+<%- include('../partials/footer') %>

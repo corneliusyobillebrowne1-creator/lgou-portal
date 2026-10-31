@@ -1,0 +1,59 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <p><a href="/portal">&larr; My portal</a></p>
+  <h1><%= e.course_title %></h1>
+
+  <% if (e.has_classroom) { %>
+  <div class="classroombox">
+    <h3>Live classes in Google Classroom</h3>
+    <% if (teacherName) { %><p>Your teacher: <strong><%= teacherName %></strong></p><% } %>
+    <% if (classroom.ok) { %>
+      <p>Live lessons, quizzes and assignments happen in the course's Google Classroom. Sign in with the Google account you want to use for class. If Google asks, your teacher may need to admit you first.</p>
+      <a class="btn red" href="/portal/classroom/<%= e.id %>" target="_blank" rel="noopener noreferrer">Join Google Classroom</a>
+      <% if (e.teacher_id) { %> <a class="btn ghost" href="/portal/results/<%= e.id %>">My attendance &amp; grades</a><% } %>
+    <% } else { %>
+      <p><%= classroom.why %></p>
+    <% } %>
+  </div>
+  <% } %>
+
+  <% if (lessons.length) { %>
+  <p><progress value="<%= e.percent %>" max="100"></progress> <%= e.percent %>% complete (<%= e.lesson_done %>/<%= e.lesson_total %> lessons)</p>
+  <div class="learn">
+    <div>
+      <div class="player">
+        <iframe src="https://www.youtube-nocookie.com/embed/<%= current.youtube_id %>?rel=0" title="<%= current.title %>"
+          allow="accelerometer; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+      </div>
+      <h2><%= current.title %></h2>
+      <div class="actions">
+        <% if (done.has(current.id)) { %>
+          <span class="badge ok">Completed</span>
+        <% } else { %>
+          <form method="post" action="/portal/learn/<%= e.id %>/complete/<%= current.id %>" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn ok" type="submit">Mark lesson as completed</button></form>
+        <% } %>
+        <a class="muted" href="https://www.youtube.com/watch?v=<%= current.youtube_id %>" target="_blank" rel="noopener noreferrer">Open on YouTube</a>
+      </div>
+      <p class="muted">Watch the whole video, then mark the lesson as completed.</p>
+
+      <% if (e.eligible && e.status === 'enrolled') { %>
+        <div class="card">
+          <h3>Course completed</h3>
+          <form method="post" action="/portal/request-certificate/<%= e.id %>"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn red" type="submit">Request my certificate</button></form>
+        </div>
+      <% } %>
+    </div>
+    <aside class="card flat">
+      <h3>Lessons</h3>
+      <ul class="lessonlist">
+        <% lessons.forEach((l, i) => { %>
+          <li><a href="/portal/learn/<%= e.id %>?lesson=<%= l.id %>" class="<%= l.id === current.id ? 'cur' : '' %>"><span><%= done.has(l.id) ? '✓' : (i + 1) + '.' %></span><span><%= l.title %></span></a></li>
+        <% }) %>
+      </ul>
+    </aside>
+  </div>
+  <% } else if (!e.has_classroom) { %>
+    <div class="card"><p>The lessons for this course are being prepared. Please check back soon.</p></div>
+  <% } %>
+</div></main>
+<%- include('../partials/footer') %>

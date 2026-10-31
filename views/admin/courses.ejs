@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <h1>Courses &amp; YouTube lessons</h1>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Course</th><th>Taught by</th><th>Type</th><th>Fee</th><th>Weeks</th><th>Lessons</th><th>Students</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    <% courses.forEach(c => { %>
+      <tr>
+        <td><%= c.title %></td><td><%= c.teacher_name || 'School (video course)' %></td><td><span class="badge <%= c.type === 'diploma' ? 'diploma' : '' %>"><%= c.type %></span></td>
+        <td><%= money(c.fee_cents) %></td><td><%= c.duration_weeks %></td>
+        <td><%= c.lesson_count %><% if (!c.lesson_count && !c.teacher_id) { %> <span class="badge warn">add videos</span><% } %></td>
+        <td><%= c.students %></td>
+        <td><span class="badge <%= c.approval_status === 'approved' ? 'ok' : c.approval_status === 'pending' ? 'warn' : 'bad' %>"><%= c.approval_status %></span>
+          <span class="badge <%= c.active ? 'ok' : 'bad' %>"><%= c.active ? 'open' : 'closed' %></span></td>
+        <td><a class="btn small" href="/admin/courses/<%= c.id %>">Edit / lessons</a></td>
+      </tr>
+    <% }) %>
+    </tbody>
+  </table></div>
+
+  <h2>Add a new course</h2>
+  <form method="post" action="/admin/courses" class="card">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <%- include('course_fields', { c: { title: '', type: 'certificate', summary: '', description: '', fee_cents: 1000, duration_weeks: 4, pass_mark: 50, active: 1 } }) %>
+    <p><button class="btn" type="submit">Create course</button></p>
+  </form>
+</div></main>
+<%- include('../partials/footer') %>

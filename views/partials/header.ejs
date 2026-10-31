@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title><%= typeof title !== 'undefined' && title ? title + ' · ' : '' %>Liberia Gateway Online University</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="bar">
+    <a class="brand" href="/"><span class="crest">LG</span><span>Liberia Gateway<br><small>Online University</small></span></a>
+    <nav>
+      <a href="/">Home</a>
+      <a href="/#courses">Courses</a>
+      <a href="/teachers">Teachers</a>
+      <a href="/teach">Teach with us</a>
+      <a href="/verify">Verify Certificate</a>
+      <% if (user) { %>
+        <a href="<%= homeFor(user) %>"><%= user.role === 'admin' ? 'Admin' : user.role === 'teacher' ? 'Teacher area' : 'My Portal' %></a>
+        <a href="/account">Account</a>
+        <form method="post" action="/logout" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="linkbtn" type="submit">Log out (<%= user.username %>)</button></form>
+      <% } else { %>
+        <a href="/login">Log in</a>
+        <a href="/signup">Student sign up</a>
+      <% } %>
+    </nav>
+  </div>
+</header>
+<% if (user && user.role === 'admin') { %>
+<div class="subnav"><div class="wrap">
+  <a href="/admin" class="<%= currentPath === '/admin' || currentPath === '/admin/' ? 'on' : '' %>">Dashboard</a>
+  <a href="/admin/students" class="<%= currentPath.startsWith('/admin/students') ? 'on' : '' %>">Students</a>
+  <a href="/admin/teachers" class="<%= currentPath.startsWith('/admin/teachers') ? 'on' : '' %>">Teachers</a>
+  <a href="/admin/payments" class="<%= currentPath.startsWith('/admin/payments') ? 'on' : '' %>">Payments</a>
+  <a href="/admin/course-approvals" class="<%= currentPath.startsWith('/admin/course-approvals') ? 'on' : '' %>">Course approvals</a>
+  <a href="/admin/courses" class="<%= currentPath.startsWith('/admin/courses') ? 'on' : '' %>">Courses &amp; YouTube</a>
+  <a href="/admin/approvals" class="<%= currentPath.startsWith('/admin/approvals') ? 'on' : '' %>">Completions</a>
+  <a href="/admin/certificates" class="<%= currentPath.startsWith('/admin/certificates') ? 'on' : '' %>">Certificates</a>
+  <a href="/admin/settings" class="<%= currentPath.startsWith('/admin/settings') ? 'on' : '' %>">Settings &amp; Backups</a>
+</div></div>
+<% } %>
+<% if (user && user.role === 'teacher' && teacher && teacher.status === 'approved') { %>
+<div class="subnav"><div class="wrap">
+  <a href="/teacher" class="<%= currentPath === '/teacher' || currentPath === '/teacher/' ? 'on' : '' %>">Dashboard</a>
+  <a href="/teacher/courses" class="<%= currentPath.startsWith('/teacher/courses') ? 'on' : '' %>">My courses</a>
+  <a href="/teacher/profile" class="<%= currentPath.startsWith('/teacher/profile') ? 'on' : '' %>">My public profile</a>
+</div></div>
+<% } %>
+<% if (flash) { %><div class="wrap"><div class="alert <%= flash.type %>"><%= flash.msg %></div></div><% } %>

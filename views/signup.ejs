@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+<main><div class="wrap"><div class="card formcard">
+  <h1>Create student account</h1>
+  <% if (error) { %><div class="alert err"><%= error %></div><% } %>
+  <form method="post" action="/signup" autocomplete="off">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label for="full_name">Full name (as it should appear on your certificate)</label>
+    <input type="text" id="full_name" name="full_name" required maxlength="80" value="<%= form.full_name || '' %>">
+    <label for="username">Username</label>
+    <input type="text" id="username" name="username" required minlength="3" maxlength="30" value="<%= form.username || '' %>" autocapitalize="none">
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" required maxlength="120" value="<%= form.email || '' %>">
+    <label for="phone">Phone / mobile money number (optional)</label>
+    <input type="tel" id="phone" name="phone" maxlength="20" value="<%= form.phone || '' %>">
+    <label for="password">Password (8+ characters, with a letter and a number)</label>
+    <input type="password" id="password" name="password" required minlength="8" autocomplete="new-password">
+    <label for="confirm">Confirm password</label>
+    <input type="password" id="confirm" name="confirm" required minlength="8" autocomplete="new-password">
+    <p class="muted">Your personal details are stored encrypted and used only for school records and your certificate.</p>
+    <button class="btn" type="submit">Create account</button>
+  </form>
+  <p class="muted">Already registered? <a href="/login">Log in</a></p>
+</div></div></main>
+<%- include('partials/footer') %>

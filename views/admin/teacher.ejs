@@ -1,0 +1,50 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <p><a href="/admin/teachers">&larr; All teachers</a></p>
+  <h1><%= t.full_name %> <span class="badge <%= t.status === 'approved' ? 'ok' : t.status === 'pending' ? 'warn' : 'bad' %>"><%= t.status %></span></h1>
+
+  <div class="card">
+    <div class="row">
+      <div><span class="muted">Username</span><br><strong><%= t.username %></strong></div>
+      <div><span class="muted">Email</span><br><strong><%= t.email %></strong></div>
+      <div><span class="muted">Phone</span><br><strong><%= t.phone || '-' %></strong></div>
+      <div><span class="muted">County</span><br><strong><%= t.county %></strong></div>
+      <div><span class="muted">Experience</span><br><strong><%= t.experience_years %> years</strong></div>
+      <div><span class="muted">Applied</span><br><strong><%= fmtDate(t.created_at) %></strong></div>
+    </div>
+    <h3>Headline</h3><p><%= t.headline %></p>
+    <h3>Subjects</h3><p><%= t.subjects %></p>
+    <h3>Qualifications</h3><p class="pre"><%= t.qualifications %></p>
+    <h3>Bio (public if approved)</h3><p class="pre"><%= t.bio %></p>
+    <% if (t.admin_note) { %><p class="alert warn">Last note to teacher: <%= t.admin_note %></p><% } %>
+  </div>
+
+  <h2>Decision</h2>
+  <form method="post" action="/admin/teachers/<%= t.user_id %>/decision" class="card">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label>Note to the teacher (required when rejecting or suspending)</label>
+    <input type="text" name="note" maxlength="300">
+    <div class="actions">
+      <button class="btn ok" type="submit" name="decision" value="approved">Approve</button>
+      <button class="btn red" type="submit" name="decision" value="rejected">Reject</button>
+      <button class="btn ghost" type="submit" name="decision" value="suspended">Suspend</button>
+    </div>
+    <p class="muted">Approving unlocks the teacher dashboard and shows the teacher's profile publicly. Suspending hides the profile and all of their courses and blocks Classroom links for their students.</p>
+  </form>
+  <form method="post" action="/admin/teachers/<%= t.user_id %>/reset-password" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn small ghost" type="submit">Reset password</button></form>
+
+  <h2>Courses by this teacher</h2>
+  <% if (!courses.length) { %><p class="muted">No courses yet.</p><% } else { %>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Course</th><th>Fee</th><th>Status</th><th>Students</th><th>Confirmed revenue</th><th></th></tr></thead>
+    <tbody>
+    <% courses.forEach(c => { %>
+      <tr><td><%= c.title %></td><td><%= money(c.fee_cents) %></td>
+      <td><span class="badge <%= c.approval_status === 'approved' ? 'ok' : c.approval_status === 'pending' ? 'warn' : 'bad' %>"><%= c.approval_status %></span></td>
+      <td><%= c.students %></td><td><%= money(c.revenue) %></td><td><a class="btn small" href="/admin/courses/<%= c.id %>">Open</a></td></tr>
+    <% }) %>
+    </tbody>
+  </table></div>
+  <% } %>
+</div></main>
+<%- include('../partials/footer') %>

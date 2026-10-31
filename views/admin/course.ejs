@@ -1,0 +1,56 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <p><a href="/admin/courses">&larr; All courses</a></p>
+  <h1><%= course.title %> <span class="badge <%= course.approval_status === 'approved' ? 'ok' : course.approval_status === 'pending' ? 'warn' : 'bad' %>"><%= course.approval_status %></span></h1>
+
+  <% if (course.teacher_id) { %>
+  <div class="card">
+    <p><strong>Teacher course</strong> by <a href="/admin/teachers/<%= course.teacher_id %>"><%= teacherName %></a></p>
+    <p>Classroom link: <a href="<%= course.classroom_url %>" target="_blank" rel="noopener noreferrer"><%= course.classroom_url %></a></p>
+    <% if (course.admin_note) { %><p class="muted">Last note to teacher: <%= course.admin_note %></p><% } %>
+    <form method="post" action="/admin/courses/<%= course.id %>/approval">
+      <input type="hidden" name="_csrf" value="<%= csrfToken() %>"><input type="hidden" name="back" value="course">
+      <label>Note to teacher (required when rejecting or suspending)</label><input type="text" name="note" maxlength="300">
+      <p class="actions">
+        <button class="btn ok" type="submit" name="decision" value="approved">Approve</button>
+        <button class="btn red" type="submit" name="decision" value="rejected">Reject</button>
+        <button class="btn ghost" type="submit" name="decision" value="suspended">Suspend</button>
+      </p>
+    </form>
+  </div>
+  <% } %>
+
+  <h2>YouTube lessons</h2>
+  <% if (!lessons.length) { %><p class="muted">No lessons yet. Add the first YouTube video below.</p><% } else { %>
+  <div class="tablewrap"><table>
+    <thead><tr><th>#</th><th>Lesson title</th><th>YouTube video</th><th></th></tr></thead>
+    <tbody>
+    <% lessons.forEach(l => { %>
+      <tr><td><%= l.position %></td><td><%= l.title %></td>
+      <td><a href="https://www.youtube.com/watch?v=<%= l.youtube_id %>" target="_blank" rel="noopener noreferrer"><%= l.youtube_id %></a></td>
+      <td><form method="post" action="/admin/lessons/<%= l.id %>/delete" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn small red" type="submit">Remove</button></form></td></tr>
+    <% }) %>
+    </tbody>
+  </table></div>
+  <% } %>
+
+  <form method="post" action="/admin/courses/<%= course.id %>/lessons" class="card">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <h3>Add a lesson</h3>
+    <div class="row">
+      <div><label>Lesson title</label><input type="text" name="title" required maxlength="150"></div>
+      <div><label>YouTube link</label><input type="text" name="youtube" required placeholder="https://www.youtube.com/watch?v=..."></div>
+      <div><label>Order (optional)</label><input type="number" name="position" min="1" placeholder="auto"></div>
+    </div>
+    <p class="muted">Use videos from the official course channel and check that the owner allows embedding (if a video will not play inside the portal, embedding is switched off for it - pick another or ask the channel owner).</p>
+    <button class="btn" type="submit">Add lesson</button>
+  </form>
+
+  <h2>Course details</h2>
+  <form method="post" action="/admin/courses/<%= course.id %>" class="card">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <%- include('course_fields', { c: course }) %>
+    <p><button class="btn" type="submit">Save course</button></p>
+  </form>
+</div></main>
+<%- include('../partials/footer') %>

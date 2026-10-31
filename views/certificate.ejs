@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Certificate <%= cert.cert_no %> · Liberia Gateway Online University</title>
+<link rel="stylesheet" href="/style.css">
+</head>
+<body class="certpage">
+<div class="cert-actions">
+  <a class="btn ghost" href="<%= user && user.role === 'admin' ? '/admin/certificates' : '/portal' %>">&larr; Back</a>
+  <button class="btn" id="printbtn" type="button">Print / Save as PDF</button>
+</div>
+<div class="certificate">
+  <span class="crest">LG</span>
+  <h1>LIBERIA GATEWAY ONLINE UNIVERSITY</h1>
+  <div class="small">Online Diploma &amp; Certificate University</div>
+  <div class="kind">Certificate of <%= cert.course_type === 'diploma' ? 'Diploma' : 'Completion' %></div>
+  <div>This is to certify that</div>
+  <div class="name"><%= cert.student_name %></div>
+  <div>has successfully completed the <%= cert.course_type %> programme</div>
+  <div class="course"><%= cert.course_title %></div>
+  <% if (cert.score !== null) { %><div class="small">Final assessment score: <%= cert.score %>%</div><% } %>
+  <% if (cert.status === 'revoked') { %><div class="revoked">REVOKED</div><% } %>
+  <p>Date issued: <strong><%= fmtDate(cert.issued_at) %></strong></p>
+  <p class="small">Certificate no. <strong><%= cert.cert_no %></strong><br>
+  Verify at <strong><%= baseUrl %>/verify</strong> &mdash; code: <strong><%= cert.verify_code %></strong></p>
+  <div class="fine"><%= DISCLAIMER %></div>
+</div>
+<script src="/print.js"></script>
+</body>
+</html>

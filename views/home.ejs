@@ -1,0 +1,74 @@
+<%- include('partials/header') %>
+<section class="hero"><div class="wrap">
+  <h1>Learn online. Earn your certificate or diploma.</h1>
+  <p>Liberia Gateway Online University offers short, affordable certificate and diploma courses taught by teachers from across Liberia. Join live classes in your teacher's Google Classroom or study with guided video lessons, pay a small fee, and receive your certificate when you finish.</p>
+  <p class="actions"><a class="btn red" href="/signup">Student sign up</a> <a class="btn ghost" href="#courses">See courses &amp; fees</a> <a class="btn ghost" href="/teach">Apply to teach</a></p>
+</div></section>
+
+<main><div class="wrap">
+  <h2 id="enroll">How students enroll</h2>
+  <div class="grid">
+    <div class="card flat"><h3>1. Sign up</h3><p>Create a student account with your own username and password.</p></div>
+    <div class="card flat"><h3>2. Choose &amp; pay</h3><p>Pick a course and pay the small course fee by mobile money, bank transfer or at the office. The school confirms your payment.</p></div>
+    <div class="card flat"><h3>3. Join your class</h3><p>Open your teacher's Google Classroom from your student portal for live lessons, quizzes and assignments, or watch the course video lessons.</p></div>
+    <div class="card flat"><h3>4. Get certified</h3><p>Finish the course, request your certificate, and download it once it is approved.</p></div>
+  </div>
+
+  <h2 id="courses">Certificate courses</h2>
+  <% if (!certificates.length) { %><p class="muted">No certificate courses are open right now.</p><% } %>
+  <div class="grid">
+    <% certificates.forEach(c => { %><%- include('partials/course_card', { c }) %><% }) %>
+  </div>
+
+  <h2>Diploma courses</h2>
+  <% if (!diplomas.length) { %><p class="muted">No diploma courses are open right now.</p><% } %>
+  <div class="grid">
+    <% diplomas.forEach(c => { %><%- include('partials/course_card', { c }) %><% }) %>
+  </div>
+
+  <h2 id="fees">Fee information</h2>
+  <div class="card flat">
+    <p>Every course has a small, fixed fee that is shown on its card<% if (feeRange) { %> (currently from <strong><%= money(feeRange.min) %></strong> to <strong><%= money(feeRange.max) %></strong> per course)<% } %>. You pay once per course, and it can be paid in parts.</p>
+    <ul>
+      <li>Pay by mobile money, bank transfer, or cash at the school office, then enter your transaction reference in your student portal.</li>
+      <li>The school office checks your payment and confirms it, usually within one working day. Your class access opens as soon as your fee is fully confirmed.</li>
+      <li>The certificate or diploma is included in the course fee.</li>
+    </ul>
+  </div>
+
+  <h2 id="teachers">Meet our teachers</h2>
+  <% if (!teachers.length) { %><p class="muted">Our first teachers are being reviewed. <a href="/teach">Apply to teach</a>.</p><% } %>
+  <div class="grid">
+    <% teachers.forEach(t => { %>
+      <article class="card teachercard">
+        <div class="avatar"><%= initials(t.full_name) %></div>
+        <div>
+          <h3><a href="/teachers/<%= t.user_id %>"><%= t.full_name %></a></h3>
+          <p class="meta"><%= t.headline %></p>
+          <p class="meta"><%= t.county %> &middot; <%= t.course_count %> course<%= t.course_count === 1 ? '' : 's' %></p>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+  <% if (teachers.length) { %><p><a href="/teachers">See all teachers &rarr;</a></p><% } %>
+
+  <h2 id="apply">Teach with us</h2>
+  <div class="card">
+    <p>Are you a teacher in Liberia? Offer your own short course to students across the country, using the Google Classroom you already know.</p>
+    <ol>
+      <li><strong>Apply:</strong> create a teacher account and tell us about your qualifications and experience.</li>
+      <li><strong>Get reviewed:</strong> our admin team reviews every application before approval.</li>
+      <li><strong>Create your course:</strong> set a small fee, add your Google Classroom link and course details. The admin team approves each course.</li>
+      <li><strong>Teach:</strong> students enroll and pay, then join your Classroom. You keep student lists, mark attendance and assign grades from your teacher dashboard.</li>
+    </ol>
+    <a class="btn red" href="/teach">Apply to become a teacher</a>
+  </div>
+
+  <h2>About the university</h2>
+  <div class="card flat">
+    <p>Liberia Gateway Online University is a private digital school focused on practical, short-term learning. Our certificate and diploma courses are taught live by approved teachers in Google Classroom, or through curated video lessons, so you can learn from anywhere in Liberia with an internet connection and pay only a small, affordable fee.</p>
+    <p>This is a learning-focused portal. Certificates and diplomas are awarded by Liberia Gateway Online University only, and every certificate can be checked on our <a href="/verify">verification page</a>.</p>
+    <p class="muted"><%= CLASSROOM_NOTE %></p>
+  </div>
+</div></main>
+<%- include('partials/footer') %>

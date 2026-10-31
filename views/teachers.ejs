@@ -1,0 +1,20 @@
+<%- include('partials/header') %>
+<main><div class="wrap">
+  <h1>Our teachers</h1>
+  <p class="muted">Every teacher listed here has been reviewed and approved by the school's admin team.</p>
+  <% if (!teachers.length) { %><div class="card flat"><p>No teachers are listed yet. <a href="/teach">Apply to teach</a>.</p></div><% } %>
+  <div class="grid">
+    <% teachers.forEach(t => { %>
+      <article class="card teachercard">
+        <div class="avatar"><%= initials(t.full_name) %></div>
+        <div>
+          <h3><a href="/teachers/<%= t.user_id %>"><%= t.full_name %></a></h3>
+          <p class="meta"><%= t.headline %></p>
+          <p class="meta"><%= t.subjects %></p>
+          <p class="meta"><%= t.county %> &middot; <%= t.experience_years %> yr experience &middot; <%= t.course_count %> course<%= t.course_count === 1 ? '' : 's' %></p>
+        </div>
+      </article>
+    <% }) %>
+  </div>
+</div></main>
+<%- include('partials/footer') %>
