@@ -46,13 +46,14 @@
     <article class="card">
       <span class="badge <%= c.type === 'diploma' ? 'diploma' : '' %>"><%= c.type %></span>
       <% if (c.live) { %><span class="badge ok">Live classes</span><% } %>
+      <% if (!c.ready) { %><span class="badge warn">Coming soon</span><% } %>
       <h3><%= c.title %></h3>
       <p><%= c.summary %></p>
       <% if (c.teacher_name) { %><p class="meta">Taught by <%= c.teacher_name %></p><% } %>
       <div class="price"><%= money(c.fee_cents) %></div>
       <div class="actions">
         <a class="btn ghost" href="/courses/<%= c.id %>">Details</a>
-        <form method="post" action="/portal/enroll/<%= c.id %>" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn" type="submit">Enroll</button></form>
+        <% if (c.ready) { %><form method="post" action="/portal/enroll/<%= c.id %>" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn" type="submit">Enroll</button></form><% } %>
       </div>
     </article>
   <% }) %>

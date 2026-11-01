@@ -25,6 +25,10 @@ router.get('/', (req, res) => {
 router.post('/enroll/:courseId', (req, res) => {
   const course = publicCourses('c.id=?', [Number(req.params.courseId)])[0];
   if (!course) return res.status(404).render('error', { title: 'Not found', message: 'Course not found or not open for enrolment.' });
+  if (!course.ready) {
+    req.session.flash = { type: 'warn', msg: 'Enrolment for this course opens soon, once its lessons are added.' };
+    return res.redirect('/courses/' + course.id);
+  }
   db.prepare('INSERT OR IGNORE INTO enrollments (user_id,course_id,fee_cents) VALUES (?,?,?)')
     .run(req.user.id, course.id, course.fee_cents);
   const e = db.prepare('SELECT id FROM enrollments WHERE user_id=? AND course_id=?').get(req.user.id, course.id);

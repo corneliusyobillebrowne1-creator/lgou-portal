@@ -11,7 +11,9 @@
     <p class="pre"><%= course.description || course.summary %></p>
     <% if (course.live) { %><p class="muted">After your fee is confirmed, a button in your student portal opens this course's Google Classroom for live lessons, quizzes and assignments.</p><% } %>
 
-    <% if (user && user.role === 'student') { %>
+    <% if (!course.ready) { %>
+      <p class="alert warn">Coming soon: enrolment opens when this course's lessons are ready.</p>
+    <% } else if (user && user.role === 'student') { %>
       <form method="post" action="/portal/enroll/<%= course.id %>"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn red" type="submit">Enroll in this course</button></form>
     <% } else if (!user) { %>
       <a class="btn red" href="/signup">Sign up to enroll</a> <a class="btn ghost" href="/login">I already have an account</a>

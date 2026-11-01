@@ -84,3 +84,5 @@ input.score{width:84px;padding:6px 8px}
 input[type=date]{width:100%;padding:9px 11px;border:1px solid #bcc6da;border-radius:7px;font:inherit;background:#fff}
 td input[type=radio]{width:18px;height:18px;accent-color:var(--navy2)}
 .classroombox{background:#e9f7ee;border:1px solid #b6e0c4;border-radius:10px;padding:16px;margin-bottom:16px}
+
+.searchbox{max-width:480px;width:100%}

@@ -14,7 +14,9 @@
     <div class="card flat"><h3>4. Get certified</h3><p>Finish the course, request your certificate, and download it once it is approved.</p></div>
   </div>
 
-  <h2 id="courses">Certificate courses</h2>
+  <h2 id="courses">Courses</h2>
+  <p><input type="search" id="coursesearch" class="searchbox" placeholder="Search courses (for example: accounting, office, farming)" aria-label="Search courses"> <span id="coursecount" class="muted"></span></p>
+  <h2>Certificate courses</h2>
   <% if (!certificates.length) { %><p class="muted">No certificate courses are open right now.</p><% } %>
   <div class="grid">
     <% certificates.forEach(c => { %><%- include('partials/course_card', { c }) %><% }) %>

@@ -81,6 +81,14 @@ function client() {
   console.log('Enrol, pay, confirm');
   r = await stu.post('/portal/enroll/1', {}, '/portal');
   check('enrol redirects to payment page', r.status === 302 && r.loc === '/portal/pay/1', r.loc);
+  r = await anon.get('/');
+  check('homepage lists the added courses with Coming soon + search box', r.text.includes('Microsoft Office Essentials') && r.text.includes('Coming soon') && r.text.includes('id="coursesearch"'));
+  r = await anon.get('/filter.js');
+  check('search script is served as an external file (CSP-safe)', r.status === 200 && r.text.includes('coursesearch'));
+  r = await stu.post('/portal/enroll/5', {}, '/portal');
+  check('course without lessons cannot be enrolled', r.status === 302 && r.loc === '/courses/5', r.loc);
+  r = await stu.get('/portal');
+  check('student dashboard shows Coming soon and no Enroll for it', r.text.includes('Coming soon') && !r.text.includes('/portal/enroll/5'));
   r = await stu.get('/portal/learn/1');
   check('lessons locked until fee is confirmed', r.status === 302 && r.loc === '/portal/pay/1');
   r = await stu.post('/portal/pay/1', { amount: '10.00', method: 'Orange Money', reference: 'OM-77889900' }, '/portal/pay/1');
