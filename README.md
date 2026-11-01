@@ -13,7 +13,7 @@ Keep the black window open while using the site; close it to stop. This runs on 
 
 ## Run it by command (optional)
 
-Requires Node.js 18 or newer.
+Requires Node.js 22 or newer (the current LTS from nodejs.org).
 
 ```bash
 npm install
