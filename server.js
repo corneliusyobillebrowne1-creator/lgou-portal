@@ -115,6 +115,7 @@ app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/teacherApply'));
 app.use('/portal', require('./routes/student'));
 app.use('/teacher', require('./routes/teacher'));
+app.use('/admin/assistant', require('./routes/assistant'));
 app.use('/admin', require('./routes/admin'));
 
 app.use((req, res) => res.status(404).render('error', { title: 'Not found', message: 'That page does not exist.' }));

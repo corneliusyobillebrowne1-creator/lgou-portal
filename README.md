@@ -109,3 +109,6 @@ BASE=http://localhost:3000 ADMIN_PASSWORD=... DATA_DIR=./data node test/teacher_
 Email notifications and password reset by email; upload of teacher ID/credential documents; automatic
 mobile-money gateway; teacher payouts / revenue share reports; PDF certificate download with QR code;
 CSV export of attendance and grades; Google sign-in; multiple admin roles (registrar / accountant).
+
+## AI assistant (optional)
+Admin > AI assistant. Paste an Anthropic API key (stored encrypted; usage is billed by Anthropic, limit 50 messages/day). The assistant answers questions about courses and finances, rewrites the text of the school's own courses (logged, one-click Undo), and proposes fee changes that only take effect when an admin presses Approve. It cannot confirm payments, issue certificates or see personal data. Tested only against a simulated API (`node test/assistant_smoke.js`), not against the real service.

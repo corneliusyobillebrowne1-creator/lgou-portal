@@ -1,0 +1,56 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <h1>School assistant (AI)</h1>
+  <div class="card flat">
+    <p><strong>What it can do:</strong> answer questions about courses and school money, improve the wording of the school's own courses (applied straight away, every change is listed below with an <em>Undo</em> button), and <em>suggest</em> fee changes.</p>
+    <p><strong>What it can never do:</strong> confirm payments, issue certificates, change a fee without your approval, edit teachers' courses, or see passwords, emails or payment references. Money decisions stay with you.</p>
+    <p class="muted">It uses an Anthropic API key that belongs to the school. Usage is paid per message to Anthropic, so the assistant is limited to <%= 50 %> messages a day. Questions you type and the school's course and money summaries are sent to Anthropic to get an answer.</p>
+  </div>
+
+  <h2>1. API key</h2>
+  <form method="post" action="/admin/assistant/key" class="card" autocomplete="off">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <p>Status: <strong><%= hasKey ? 'Key saved (stored encrypted). Assistant is on.' : 'No key. Assistant is off.' %></strong></p>
+    <label for="api_key">Paste your Anthropic API key (leave empty and press Save to remove it)</label>
+    <input type="password" id="api_key" name="api_key" autocomplete="off" placeholder="sk-ant-...">
+    <p><button class="btn" type="submit">Save key</button></p>
+  </form>
+
+  <% if (pending.length) { %>
+  <h2>Needs your approval (money)</h2>
+  <% pending.forEach(a => { %>
+    <div class="card">
+      <p><%= a.summary %></p>
+      <form method="post" action="/admin/assistant/actions/<%= a.id %>/approve" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn" type="submit">Approve</button></form>
+      <form method="post" action="/admin/assistant/actions/<%= a.id %>/reject" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn ghost" type="submit">Reject</button></form>
+    </div>
+  <% }) %>
+  <% } %>
+
+  <h2>2. Ask the assistant</h2>
+  <div class="card">
+    <% if (!chat.length) { %><p class="muted">Try: "Give me a finance summary", "Which students owe the most?", "Rewrite the Microsoft Office Essentials description so it is clearer", or "Suggest a fee for the Accounting diploma".</p><% } %>
+    <% chat.forEach(m => { %>
+      <p><strong><%= m.role === 'user' ? 'You' : 'Assistant' %>:</strong> <span class="pre"><%= m.text %></span></p>
+    <% }) %>
+    <form method="post" action="/admin/assistant/ask">
+      <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+      <label for="message">Your message</label>
+      <textarea id="message" name="message" maxlength="1500" required></textarea>
+      <p><button class="btn" type="submit" <%= hasKey ? '' : 'disabled' %>>Send</button></p>
+    </form>
+    <% if (chat.length) { %><form method="post" action="/admin/assistant/clear"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn ghost" type="submit">Clear conversation</button></form><% } %>
+  </div>
+
+  <h2>Change log</h2>
+  <% if (!recent.length) { %><p class="muted">Nothing yet.</p><% } else { %>
+  <div class="tablewrap"><table>
+    <thead><tr><th>When (UTC)</th><th>What</th><th>Status</th><th></th></tr></thead>
+    <tbody><% recent.forEach(a => { %><tr>
+      <td><%= a.created_at %></td><td><%= a.summary %></td><td><%= a.status %></td>
+      <td><% if (a.kind === 'edit' && a.status === 'applied') { %><form method="post" action="/admin/assistant/actions/<%= a.id %>/undo"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn ghost" type="submit">Undo</button></form><% } %></td>
+    </tr><% }) %></tbody>
+  </table></div>
+  <% } %>
+</div></main>
+<%- include('../partials/footer') %>
