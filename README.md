@@ -3,7 +3,15 @@
 Public website, student portal, **teacher platform** and admin/ERP dashboard, with encrypted data and
 database backups. Node.js + Express + SQLite (one database file, no separate server to install).
 
-## Run it
+## Easiest: double-click to start (your own computer)
+
+1. Install **Node.js (LTS)** from nodejs.org if you do not have it (the launcher opens the page for you).
+2. **Windows:** double-click `START-WINDOWS.bat`. **Mac:** right-click `START-MAC-LINUX.command` → Open (the first time only).
+3. First start takes a minute, then it asks you to choose an admin password. Your browser opens at http://localhost:3000. Log in as `admin`.
+
+Keep the black window open while using the site; close it to stop. This runs on your computer only - to put the school online for students, see `DEPLOY.md`.
+
+## Run it by command (optional)
 
 Requires Node.js 18 or newer.
 
