@@ -18,7 +18,7 @@ nav form{margin:0}
 .subnav a:hover,.subnav a.on{background:var(--bg)}
 main{padding:26px 0 40px}
 h1{font-size:1.7rem;margin:.2em 0 .5em;color:var(--navy)} h2{font-size:1.3rem;color:var(--navy);margin:1.4em 0 .5em} h3{margin:.2em 0 .4em;color:var(--navy)}
-.hero{background:linear-gradient(rgba(11,42,91,.35),rgba(11,42,91,.7)),url(/hero.svg) center bottom/cover no-repeat,var(--navy);color:#fff;padding:70px 0 80px}
+.hero{background:linear-gradient(rgba(11,42,91,.72),rgba(11,42,91,.82)),url(/hero.jpg) center/cover no-repeat,var(--navy);color:#fff;padding:70px 0 80px}
 .hero h1{color:#fff;font-size:2.1rem;margin:0 0 .3em} .hero p{max-width:620px;opacity:.93;font-size:1.08rem}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;box-shadow:0 1px 2px rgba(11,42,91,.05)}
@@ -87,4 +87,7 @@ td input[type=radio]{width:18px;height:18px;accent-color:var(--navy2)}
 
 .searchbox{max-width:480px;width:100%}
 
-.logo{display:block;width:44px;height:44px}
+.logo{display:block;width:52px;height:52px;background:#fff;border-radius:10px;padding:2px}
+
+.herologo{float:right;margin:0 0 12px 24px;background:#fff;border-radius:16px;padding:6px;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+@media(max-width:700px){.herologo{display:none}}

@@ -169,9 +169,9 @@ function client() {
   r = await stu.get(r.loc || '/portal');
   check('students see the admin\'s payment details', r.text.includes('Send to 0770 123 456') && !r.text.includes('MTN Mobile Money'));
   r = await adm.get('/');
-  check('logo is shown in the header', r.text.includes('/logo.svg'));
-  r = await anon.get('/hero.svg');
-  check('hero background image is served', r.status === 200 && r.text.includes('<svg'));
+  check('logo is shown in the header', r.text.includes('/logo.png'));
+  r = await anon.get('/hero.jpg');
+  check('hero background image is served', r.status === 200);
   r = await adm.post('/admin/backup', {}, '/admin/settings');
   const bdir = process.env.BACKUP_DIR;
   if (bdir) check('backup file created', fs.readdirSync(bdir).some(f => /^lgou-.*\.db$/.test(f)));
