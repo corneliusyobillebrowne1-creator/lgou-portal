@@ -10,7 +10,7 @@ const { runBackup, listBackups } = require('../lib/backup');
 
 router.use(requireAdmin);
 
-const METHODS = ['Orange Money', 'MTN Mobile Money', 'Bank transfer', 'Cash at school office'];
+const { methodNames, saveMethods, methodsText } = require('../lib/payments');
 const flash = (req, type, msg) => { req.session.flash = { type, msg }; };
 const notFound = (res, what) => res.status(404).render('error', { title: 'Not found', message: what + ' not found.' });
 
@@ -56,7 +56,7 @@ router.get('/students/:id', (req, res) => {
   const payments = db.prepare(`SELECT p.*, c.title AS course_title FROM payments p
     JOIN enrollments e ON e.id=p.enrollment_id JOIN courses c ON c.id=e.course_id
     WHERE p.user_id=? ORDER BY p.id DESC`).all(u.id).map(p => ({ ...p, reference: decrypt(p.reference_enc) }));
-  res.render('admin/student', { title: student.full_name, s: student, enrollments, payments, methods: METHODS });
+  res.render('admin/student', { title: student.full_name, s: student, enrollments, payments, methods: methodNames() });
 });
 
 router.post('/students/:id/toggle', (req, res) => {
@@ -100,7 +100,7 @@ router.post('/enrollments/:id/payment', (req, res) => {
   const amount = parseMoney(req.body.amount);
   const method = String(req.body.method || '');
   const ref = String(req.body.reference || '').trim() || 'Recorded by admin';
-  if (!amount || !METHODS.includes(method)) { flash(req, 'warn', 'Enter a valid amount and payment method.'); return res.redirect('/admin/students/' + e.user_id); }
+  if (!amount || !methodNames().includes(method)) { flash(req, 'warn', 'Enter a valid amount and payment method.'); return res.redirect('/admin/students/' + e.user_id); }
   db.prepare(`INSERT INTO payments (enrollment_id,user_id,amount_cents,method,reference_enc,status,reviewed_by,reviewed_at)
     VALUES (?,?,?,?,?,'confirmed',?,datetime('now'))`).run(e.id, e.user_id, amount, method, encrypt(ref), req.user.id);
   audit(req.user.id, 'payment_recorded', `enrollment ${e.id}: ${amount} cents`, req.ip);
@@ -355,16 +355,17 @@ router.post('/certificates/:id/toggle', (req, res) => {
 // ---------- settings & backups ----------
 router.get('/settings', (req, res) => {
   res.render('admin/settings', {
-    title: 'Settings & Backups', instructions: getSetting('payment_instructions'), backups: listBackups(),
+    title: 'Settings & Backups', instructions: getSetting('payment_instructions'), methodsText: methodsText(), backups: listBackups(),
     maxFee: (parseInt(getSetting('teacher_max_fee_cents', '5000'), 10) / 100).toFixed(2)
   });
 });
 
 router.post('/settings', (req, res) => {
   setSetting('payment_instructions', String(req.body.instructions || '').trim().slice(0, 2000));
+  saveMethods(req.body.methods);
   const mf = parseMoney(req.body.max_fee);
   if (mf && mf > 0) setSetting('teacher_max_fee_cents', String(mf));
-  audit(req.user.id, 'settings_updated', 'payment instructions', req.ip);
+  audit(req.user.id, 'settings_updated', 'payment instructions and methods', req.ip);
   flash(req, 'ok', 'Settings saved.');
   res.redirect('/admin/settings');
 });

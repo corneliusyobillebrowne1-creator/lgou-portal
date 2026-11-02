@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Liberia Gateway Online University logo">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f6d77a"/><stop offset="1" stop-color="#c9971c"/></linearGradient>
+    <linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1d4e9e"/><stop offset="1" stop-color="#0b2a5b"/></linearGradient>
+  </defs>
+  <path d="M60 4 108 20v38c0 31-20 50-48 58C32 108 12 89 12 58V20z" fill="url(#b)" stroke="url(#g)" stroke-width="4"/>
+  <path d="M34 86V56a26 26 0 0 1 52 0v30" fill="none" stroke="url(#g)" stroke-width="6" stroke-linecap="round"/>
+  <path d="M60 80c-8-6-17-7-26-5V54c9-2 18-1 26 5 8-6 17-7 26-5v21c-9-2-18-1-26 5z" fill="#fff"/>
+  <path d="M60 59v21" stroke="#0b2a5b" stroke-width="2"/>
+  <circle cx="60" cy="30" r="6" fill="url(#g)"/>
+  <path d="M60 36v8" stroke="url(#g)" stroke-width="3"/>
+</svg>

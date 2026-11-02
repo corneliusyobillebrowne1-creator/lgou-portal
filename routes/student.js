@@ -7,7 +7,7 @@ const { parseMoney } = require('../lib/util');
 
 router.use(requireStudent);
 
-const METHODS = ['Orange Money', 'MTN Mobile Money', 'Bank transfer', 'Cash at school office'];
+const { getMethods, methodNames } = require('../lib/payments');
 
 // Always loads the enrollment through the logged-in student's id, so nobody can open another student's record.
 function myEnrollment(req, res) {
@@ -41,7 +41,7 @@ router.get('/pay/:id', (req, res) => {
   const payments = db.prepare('SELECT * FROM payments WHERE enrollment_id=? ORDER BY id DESC').all(e.id)
     .map(p => ({ ...p, reference: decrypt(p.reference_enc) }));
   res.render('student/pay', {
-    title: 'Pay fees', e, payments, methods: METHODS,
+    title: 'Pay fees', e, payments, methods: getMethods(),
     instructions: getSetting('payment_instructions'), error: null
   });
 });
@@ -54,11 +54,11 @@ router.post('/pay/:id', (req, res) => {
   const fail = (error) => {
     const payments = db.prepare('SELECT * FROM payments WHERE enrollment_id=? ORDER BY id DESC').all(e.id)
       .map(p => ({ ...p, reference: decrypt(p.reference_enc) }));
-    return res.status(400).render('student/pay', { title: 'Pay fees', e, payments, methods: METHODS, instructions: getSetting('payment_instructions'), error });
+    return res.status(400).render('student/pay', { title: 'Pay fees', e, payments, methods: getMethods(), instructions: getSetting('payment_instructions'), error });
   };
   if (!amount || amount <= 0) return fail('Enter a valid amount, for example 10 or 10.50.');
   if (amount > e.owed_cents) return fail('That is more than the balance you owe.');
-  if (!METHODS.includes(method)) return fail('Choose a payment method.');
+  if (!methodNames().includes(method)) return fail('Choose a payment method.');
   if (ref.length < 4 || ref.length > 60) return fail('Enter the transaction reference or receipt number (4-60 characters).');
   db.prepare('INSERT INTO payments (enrollment_id,user_id,amount_cents,method,reference_enc) VALUES (?,?,?,?,?)')
     .run(e.id, req.user.id, amount, method, encrypt(ref));

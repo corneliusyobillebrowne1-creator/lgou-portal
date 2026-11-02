@@ -161,6 +161,17 @@ function client() {
   }
 
   console.log('Backups');
+  r = await adm.post('/admin/settings', { instructions: 'Pay the office.', max_fee: '50', methods: 'Orange Money | Send to 0770 123 456 (LGOU Office)\nBank transfer' }, '/admin/settings');
+  r = await adm.get('/admin/settings');
+  check('admin can edit payment methods', r.text.includes('Send to 0770 123 456'));
+  await adm.post('/admin/courses/2/lessons', { title: 'Intro', youtube: 'https://youtu.be/9bZkp7q19f0' }, '/admin/courses/2');
+  r = await stu.post('/portal/enroll/2', {}, '/portal');
+  r = await stu.get(r.loc || '/portal');
+  check('students see the admin\'s payment details', r.text.includes('Send to 0770 123 456') && !r.text.includes('MTN Mobile Money'));
+  r = await adm.get('/');
+  check('logo is shown in the header', r.text.includes('/logo.svg'));
+  r = await anon.get('/hero.svg');
+  check('hero background image is served', r.status === 200 && r.text.includes('<svg'));
   r = await adm.post('/admin/backup', {}, '/admin/settings');
   const bdir = process.env.BACKUP_DIR;
   if (bdir) check('backup file created', fs.readdirSync(bdir).some(f => /^lgou-.*\.db$/.test(f)));
