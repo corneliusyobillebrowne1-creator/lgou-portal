@@ -4,6 +4,7 @@ const { encrypt, decrypt } = require('../lib/crypto');
 const { requireStudent } = require('../lib/auth');
 const { enrollmentRows, publicCourses, PUBLIC_OK } = require('../lib/queries');
 const { parseMoney } = require('../lib/util');
+const site = require('../lib/site');
 
 router.use(requireStudent);
 
@@ -19,7 +20,18 @@ function myEnrollment(req, res) {
 router.get('/', (req, res) => {
   const enrollments = enrollmentRows('e.user_id=?', [req.user.id]);
   const available = publicCourses('c.id NOT IN (SELECT course_id FROM enrollments WHERE user_id=?)', [req.user.id]);
-  res.render('student/dashboard', { title: 'My Portal', enrollments, available });
+  res.render('student/dashboard', { title: 'My Portal', enrollments, available, news: site.announcements(3) });
+});
+
+// Academic transcript: every programme with progress, grade average and any qualification issued. Only the student's own records.
+router.get('/transcript', (req, res) => {
+  const rows = enrollmentRows('e.user_id=?', [req.user.id]).map(e => {
+    const g = db.prepare(`SELECT COALESCE(SUM(g.score),0) AS got, COALESCE(SUM(i.max_score),0) AS max FROM grades g
+      JOIN grade_items i ON i.id=g.item_id WHERE g.enrollment_id=? AND g.score IS NOT NULL`).get(e.id);
+    const cert = db.prepare("SELECT cert_no, issued_at, status FROM certificates WHERE enrollment_id=?").get(e.id);
+    return { ...e, gradePct: g.max ? Math.round((g.got * 1000) / g.max) / 10 : null, cert };
+  });
+  res.render('student/transcript', { title: 'Transcript', rows, generated: new Date().toISOString() });
 });
 
 router.post('/enroll/:courseId', (req, res) => {

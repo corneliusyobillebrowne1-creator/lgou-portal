@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const rateLimit = require('express-rate-limit');
-const { db, audit } = require('../lib/db');
+const { db, audit, assignStudentNo } = require('../lib/db');
 const { encrypt, blindIndex } = require('../lib/crypto');
 const { requireLogin, homeFor } = require('../lib/auth');
 const { passwordProblem } = require('../lib/util');
@@ -55,6 +55,7 @@ router.post('/signup', signupLimiter, async (req, res, next) => {
     const hash = await bcrypt.hash(pw, 12);
     const info = db.prepare(`INSERT INTO users (username,password_hash,role,full_name_enc,email_enc,email_idx,phone_enc)
       VALUES (?,?,?,?,?,?,?)`).run(f.username, hash, 'student', encrypt(f.full_name), encrypt(f.email), idx, encrypt(f.phone));
+    assignStudentNo(info.lastInsertRowid);
     audit(info.lastInsertRowid, 'signup', f.username, req.ip);
     startSession(req, res, { id: info.lastInsertRowid, role: 'student' });
   } catch (e) { next(e); }

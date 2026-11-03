@@ -1,11 +1,11 @@
 <article class="card coursecard" data-title="<%= (c.title + ' ' + c.type + ' ' + (c.summary || '')).toLowerCase() %>">
-  <span class="badge <%= c.type === 'diploma' ? 'diploma' : '' %>"><%= c.type %></span>
+  <span class="badge <%= badgeClass(c.type) %>"><%= typeLabel(c.type) %></span>
   <% if (c.live) { %><span class="badge ok">Live classes</span><% } %>
   <% if (!c.ready) { %><span class="badge warn">Coming soon</span><% } %>
   <h3><%= c.title %></h3>
   <p><%= c.summary %></p>
   <p class="meta">
-    <%= c.duration_weeks %> weeks
+    <%= durationLabel(c.duration_weeks) %>
     <% if (c.lesson_count) { %>&middot; <%= c.lesson_count %> video lessons<% } %>
     <% if (c.teacher_name) { %><br>Taught by <%= c.teacher_name %><% } %>
   </p>

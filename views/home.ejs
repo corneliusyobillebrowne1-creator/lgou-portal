@@ -1,29 +1,46 @@
 <%- include('partials/header') %>
 <section class="hero"><div class="wrap">
-  <img class="herologo" src="/logo.png" alt="Liberia Gateway Online University crest" width="190" height="190">
-  <h1>Learn online. Earn your certificate or diploma.</h1>
-  <p>Liberia Gateway Online University offers short, affordable certificate and diploma courses taught by teachers from across Liberia. Join live classes in your teacher's Google Classroom or study with guided video lessons, pay a small fee, and receive your certificate when you finish.</p>
-  <p class="actions"><a class="btn red" href="/signup">Student sign up</a> <a class="btn ghost" href="#courses">See courses &amp; fees</a> <a class="btn ghost" href="/teach">Apply to teach</a></p>
+  <img class="herologo" src="/logo.png" alt="Liberia Gateway Online College crest" width="190" height="190">
+  <h1>Learn online. Earn your certificate, diploma or AA degree.</h1>
+  <p>Liberia Gateway Online College is a private online college in Liberia offering short certificate courses, diploma programmes and two-year Associate of Arts (AA) degrees. Study with teachers in Google Classroom or with guided video lessons, pay affordable fees, and receive your qualification when you finish.</p>
+  <p class="actions"><a class="btn red" href="/signup">Apply / Sign up</a> <a class="btn ghost" href="/admissions">Admissions</a> <a class="btn ghost" href="#courses">See courses &amp; fees</a> <a class="btn ghost" href="/teach">Apply to teach</a></p>
 </div></section>
 
 <main><div class="wrap">
+  <% if (news.length) { %>
+  <div class="card flat news"><h3>Announcements</h3>
+    <% news.forEach(n => { %><p><strong><%= n.title %></strong> <span class="muted">(<%= fmtDate(n.created_at) %>)</span><% if (n.body) { %><br><span class="pre"><%= n.body %></span><% } %></p><% }) %>
+  </div>
+  <% } %>
+  <div class="grid quick">
+    <a class="card flat quicklink" href="#courses"><h3>Programmes</h3><p>AA degrees, diplomas and certificates</p></a>
+    <a class="card flat quicklink" href="/admissions"><h3>Admissions</h3><p>Requirements and how to apply</p></a>
+    <a class="card flat quicklink" href="#fees"><h3>Fees</h3><p>Affordable fees, paid in parts</p></a>
+    <a class="card flat quicklink" href="/login"><h3>Student portal</h3><p>Log in to study, pay and view results</p></a>
+  </div>
   <h2 id="enroll">How students enroll</h2>
   <div class="grid">
     <div class="card flat"><h3>1. Sign up</h3><p>Create a student account with your own username and password.</p></div>
     <div class="card flat"><h3>2. Choose &amp; pay</h3><p>Pick a course and pay the small course fee by mobile money, bank transfer or at the office. The school confirms your payment.</p></div>
     <div class="card flat"><h3>3. Join your class</h3><p>Open your teacher's Google Classroom from your student portal for live lessons, quizzes and assignments, or watch the course video lessons.</p></div>
-    <div class="card flat"><h3>4. Get certified</h3><p>Finish the course, request your certificate, and download it once it is approved.</p></div>
+    <div class="card flat"><h3>4. Get certified</h3><p>Finish your programme, request your certificate, diploma or degree, and download it once it is approved.</p></div>
   </div>
 
   <h2 id="courses">Courses</h2>
   <p><input type="search" id="coursesearch" class="searchbox" placeholder="Search courses (for example: accounting, office, farming)" aria-label="Search courses"> <span id="coursecount" class="muted"></span></p>
+  <h2>Associate of Arts (AA) degrees</h2>
+  <% if (!associates.length) { %><p class="muted">No degree programmes are open right now.</p><% } %>
+  <div class="grid">
+    <% associates.forEach(c => { %><%- include('partials/course_card', { c }) %><% }) %>
+  </div>
+
   <h2>Certificate courses</h2>
   <% if (!certificates.length) { %><p class="muted">No certificate courses are open right now.</p><% } %>
   <div class="grid">
     <% certificates.forEach(c => { %><%- include('partials/course_card', { c }) %><% }) %>
   </div>
 
-  <h2>Diploma courses</h2>
+  <h2>Diploma programmes</h2>
   <% if (!diplomas.length) { %><p class="muted">No diploma courses are open right now.</p><% } %>
   <div class="grid">
     <% diplomas.forEach(c => { %><%- include('partials/course_card', { c }) %><% }) %>
@@ -67,10 +84,10 @@
     <a class="btn red" href="/teach">Apply to become a teacher</a>
   </div>
 
-  <h2>About the university</h2>
+  <h2>About the college</h2>
   <div class="card flat">
-    <p>Liberia Gateway Online University is a private digital school focused on practical, short-term learning. Our certificate and diploma courses are taught live by approved teachers in Google Classroom, or through curated video lessons, so you can learn from anywhere in Liberia with an internet connection and pay only a small, affordable fee.</p>
-    <p>This is a learning-focused portal. Certificates and diplomas are awarded by Liberia Gateway Online University only, and every certificate can be checked on our <a href="/verify">verification page</a>.</p>
+    <p>Liberia Gateway Online College is a private digital college focused on practical, affordable learning. We offer Associate of Arts (AA) degrees, diploma programmes and certificate courses, taught live by approved teachers in Google Classroom or through guided video lessons, so you can study from anywhere in Liberia. <a href="/about">Read more about the college</a>.</p>
+    <p>All certificates, diplomas and AA degrees are awarded by Liberia Gateway Online College only, and every qualification can be checked on the <a href="/verify">Verify</a> page.</p>
     <p class="muted"><%= CLASSROOM_NOTE %></p>
   </div>
 </div></main>

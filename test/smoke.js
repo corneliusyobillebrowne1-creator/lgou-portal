@@ -39,7 +39,7 @@ function client() {
   const anon = client();
   let r = await anon.get('/');
   check('homepage loads with courses and fees', r.status === 200 && r.text.includes('Computer Basics') && r.text.includes('$10.00'));
-  check('homepage shows the disclaimer', r.text.includes('awarded by Liberia Gateway Online University only'));
+  check('homepage shows the disclaimer', r.text.includes('awarded by Liberia Gateway Online College only'));
   check('CSP header present', (r.headers.get('content-security-policy') || '').includes("frame-src https://www.youtube-nocookie.com"));
   r = await anon.get('/admin');
   check('anonymous cannot open /admin (redirected to login)', r.status === 302 && r.loc === '/login');
@@ -83,6 +83,9 @@ function client() {
   check('enrol redirects to payment page', r.status === 302 && r.loc === '/portal/pay/1', r.loc);
   r = await anon.get('/');
   check('homepage lists the added courses with Coming soon + search box', r.text.includes('Microsoft Office Essentials') && r.text.includes('Coming soon') && r.text.includes('id="coursesearch"'));
+  r = await anon.get('/');
+  check('homepage says College and lists AA degrees', r.text.includes('Online College') && !r.text.includes('Online University') && r.text.includes('Associate of Arts (AA) in Business Administration'));
+  for (const pth of ['/admissions', '/about']) { r = await anon.get(pth); check(pth + ' page opens', r.status === 200 && r.text.includes('Online College')); }
   r = await anon.get('/filter.js');
   check('search script is served as an external file (CSP-safe)', r.status === 200 && r.text.includes('coursesearch'));
   r = await stu.post('/portal/enroll/5', {}, '/portal');
@@ -119,7 +122,7 @@ function client() {
   r = await adm.post('/admin/approvals/1/approve', { score: '85' }, '/admin/approvals');
   check('passing score approves', r.status === 302 && r.loc === '/admin/certificates', r.loc);
   r = await stu.get('/portal/certificate/1');
-  check('student can open certificate with disclaimer', r.status === 200 && r.text.includes('Mary Kollie') && r.text.includes('awarded by Liberia Gateway Online University only'));
+  check('student can open certificate with disclaimer', r.status === 200 && r.text.includes('Mary Kollie') && r.text.includes('awarded by Liberia Gateway Online College only'));
   r = await adm.get('/admin/certificates');
   const code = (r.text.match(/code ([a-f0-9]{16})/) || [])[1];
   check('verification code issued', !!code);
@@ -161,7 +164,7 @@ function client() {
   }
 
   console.log('Backups');
-  r = await adm.post('/admin/settings', { instructions: 'Pay the office.', max_fee: '50', methods: 'Orange Money | Send to 0770 123 456 (LGOU Office)\nBank transfer' }, '/admin/settings');
+  r = await adm.post('/admin/settings', { instructions: 'Pay the office.', max_fee: '50', methods: 'Orange Money | Send to 0770 123 456 (LGOC Office)\nBank transfer' }, '/admin/settings');
   r = await adm.get('/admin/settings');
   check('admin can edit payment methods', r.text.includes('Send to 0770 123 456'));
   await adm.post('/admin/courses/2/lessons', { title: 'Intro', youtube: 'https://youtu.be/9bZkp7q19f0' }, '/admin/courses/2');
@@ -176,6 +179,25 @@ function client() {
   const bdir = process.env.BACKUP_DIR;
   if (bdir) check('backup file created', fs.readdirSync(bdir).some(f => /^lgou-.*\.db$/.test(f)));
 
+  r = await stu.get('/portal');
+  check('student sees student number', /Student no\. LGOC-\d{4}-\d{5}/.test(r.text));
+  r = await stu.get('/portal/transcript');
+  check('student transcript opens', r.status === 200 && r.text.includes('Academic transcript') && r.text.includes('Mary Kollie'));
+  r = await anon.get('/portal/transcript');
+  check('transcript is closed to visitors', r.status === 302);
+  await adm.post('/admin/announcements', { title: 'Registration is open', body: 'Classes start soon.' }, '/admin/announcements');
+  r = await anon.get('/');
+  check('announcement appears on homepage', r.text.includes('Registration is open'));
+  r = await stu.get('/portal');
+  check('announcement appears in student portal', r.text.includes('Registration is open'));
+  r = await adm.post('/admin/settings', { college_contact: 'Monrovia office, tel 0770 111 222', accreditation_statement: 'Test statement of status.' }, '/admin/settings');
+  r = await anon.get('/about');
+  check('admin-edited contact and accreditation show on About', r.text.includes('0770 111 222') && r.text.includes('Test statement of status.'));
+  r = await anon.get('/admissions');
+  check('methods untouched when only college info saved', r.text.includes('Orange Money'));
+  const aa = await adm.post('/admin/courses', { title: 'Associate of Arts (AA) in Test Studies', type: 'associate', summary: 's', description: 'd', fee: '250', duration_weeks: '96', pass_mark: '60', active: '1' }, '/admin/courses');
+  r = await adm.get('/admin/courses');
+  check('admin can create an AA degree course', r.text.includes('Test Studies') && r.text.includes('AA Degree'));
   console.log(`\n${pass} passed, ${failed} failed`);
   process.exit(failed ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(2); });

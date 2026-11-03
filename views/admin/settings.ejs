@@ -15,6 +15,19 @@
     <p><button class="btn" type="submit">Save</button></p>
   </form>
 
+  <h2>College information shown to the public</h2>
+  <form method="post" action="/admin/settings" class="card">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label for="college_contact">Contact details (address, phone, email, office hours)</label>
+    <textarea id="college_contact" name="college_contact" maxlength="600"><%= site.contact %></textarea>
+    <label for="admission_requirements">Entry requirements (shown on the Admissions page)</label>
+    <textarea id="admission_requirements" name="admission_requirements" maxlength="1500"><%= site.admissions %></textarea>
+    <label for="accreditation_statement">Recognition / accreditation statement (shown on the About page)</label>
+    <textarea id="accreditation_statement" name="accreditation_statement" maxlength="1200"><%= site.accreditation %></textarea>
+    <p class="muted">Only state accreditation or government recognition if the college really holds it.</p>
+    <p><button class="btn" type="submit">Save college information</button></p>
+  </form>
+
   <h2>Database backups</h2>
   <div class="card">
     <p>A backup is created automatically every 24 hours (newest 14 are kept in the <code>backups</code> folder). You can also make one now.</p>

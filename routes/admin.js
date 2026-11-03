@@ -138,7 +138,7 @@ function courseFields(body) {
   const weeks = parseInt(body.duration_weeks, 10);
   const pass = parseInt(body.pass_mark, 10);
   const title = String(body.title || '').trim();
-  const type = body.type === 'diploma' ? 'diploma' : 'certificate';
+  const type = ['diploma', 'associate'].includes(body.type) ? body.type : 'certificate';
   if (title.length < 3 || title.length > 120) return { error: 'Enter a course title (3-120 characters).' };
   if (fee === null) return { error: 'Enter a valid fee, e.g. 15 or 15.50.' };
   if (!(weeks >= 1 && weeks <= 104)) return { error: 'Duration must be 1-104 weeks.' };
@@ -352,20 +352,42 @@ router.post('/certificates/:id/toggle', (req, res) => {
   res.redirect('/admin/certificates');
 });
 
+// ---------- announcements ----------
+router.get('/announcements', (req, res) => {
+  res.render('admin/announcements', { title: 'Announcements', items: db.prepare('SELECT * FROM announcements ORDER BY id DESC LIMIT 50').all() });
+});
+router.post('/announcements', (req, res) => {
+  const title = String(req.body.title || '').trim().slice(0, 120), body = String(req.body.body || '').trim().slice(0, 1000);
+  if (title.length < 3) { flash(req, 'warn', 'Enter a title (at least 3 characters).'); return res.redirect('/admin/announcements'); }
+  db.prepare('INSERT INTO announcements (title,body) VALUES (?,?)').run(title, body);
+  audit(req.user.id, 'announcement_added', title, req.ip);
+  flash(req, 'ok', 'Announcement published on the homepage and student portal.');
+  res.redirect('/admin/announcements');
+});
+router.post('/announcements/:id/delete', (req, res) => {
+  db.prepare('DELETE FROM announcements WHERE id=?').run(Number(req.params.id));
+  audit(req.user.id, 'announcement_deleted', 'id ' + req.params.id, req.ip);
+  res.redirect('/admin/announcements');
+});
+
 // ---------- settings & backups ----------
 router.get('/settings', (req, res) => {
   res.render('admin/settings', {
-    title: 'Settings & Backups', instructions: getSetting('payment_instructions'), methodsText: methodsText(), backups: listBackups(),
+    title: 'Settings & Backups', instructions: getSetting('payment_instructions'), methodsText: methodsText(), site: require('../lib/site').info(), backups: listBackups(),
     maxFee: (parseInt(getSetting('teacher_max_fee_cents', '5000'), 10) / 100).toFixed(2)
   });
 });
 
 router.post('/settings', (req, res) => {
-  setSetting('payment_instructions', String(req.body.instructions || '').trim().slice(0, 2000));
-  saveMethods(req.body.methods);
-  const mf = parseMoney(req.body.max_fee);
-  if (mf && mf > 0) setSetting('teacher_max_fee_cents', String(mf));
-  audit(req.user.id, 'settings_updated', 'payment instructions and methods', req.ip);
+  const b = req.body, has = (k) => typeof b[k] === 'string';
+  const txt = (k, max) => setSetting(k, String(b[k]).trim().slice(0, max));
+  if (has('instructions')) txt('payment_instructions', 2000);
+  if (has('methods')) saveMethods(b.methods);
+  if (has('max_fee')) { const mf = parseMoney(b.max_fee); if (mf && mf > 0) setSetting('teacher_max_fee_cents', String(mf)); }
+  if (has('college_contact')) txt('college_contact', 600);
+  if (has('admission_requirements')) txt('admission_requirements', 1500);
+  if (has('accreditation_statement')) txt('accreditation_statement', 1200);
+  audit(req.user.id, 'settings_updated', Object.keys(b).filter(k => k !== '_csrf').join(','), req.ip);
   flash(req, 'ok', 'Settings saved.');
   res.redirect('/admin/settings');
 });

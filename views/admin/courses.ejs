@@ -6,7 +6,7 @@
     <tbody>
     <% courses.forEach(c => { %>
       <tr>
-        <td><%= c.title %></td><td><%= c.teacher_name || 'School (video course)' %></td><td><span class="badge <%= c.type === 'diploma' ? 'diploma' : '' %>"><%= c.type %></span></td>
+        <td><%= c.title %></td><td><%= c.teacher_name || 'School (video course)' %></td><td><span class="badge <%= badgeClass(c.type) %>"><%= typeLabel(c.type) %></span></td>
         <td><%= money(c.fee_cents) %></td><td><%= c.duration_weeks %></td>
         <td><%= c.lesson_count %><% if (!c.lesson_count && !c.teacher_id) { %> <span class="badge warn">add videos</span><% } %></td>
         <td><%= c.students %></td>

@@ -1,4 +1,4 @@
-# Liberia Gateway Online University – Teacher & Student Portal
+# Liberia Gateway Online College – Teacher & Student Portal
 
 Public website, student portal, **teacher platform** and admin/ERP dashboard, with encrypted data and
 database backups. Node.js + Express + SQLite (one database file, no separate server to install).
@@ -112,3 +112,6 @@ CSV export of attendance and grades; Google sign-in; multiple admin roles (regis
 
 ## AI assistant (optional)
 Admin > AI assistant. Paste an Anthropic API key (stored encrypted; usage is billed by Anthropic, limit 50 messages/day). The assistant answers questions about courses and finances, rewrites the text of the school's own courses (logged, one-click Undo), and proposes fee changes that only take effect when an admin presses Approve. It cannot confirm payments, issue certificates or see personal data. Tested only against a simulated API (`node test/assistant_smoke.js`), not against the real service.
+
+## College levels and portal features
+Programmes come in three levels: certificate, diploma and Associate of Arts (AA) degree (admin chooses the level when adding a course). Public pages: Home, Admissions, About, Teachers, Verify. Students get a student number, transcript and announcements. Admin > Settings holds the contact details, entry requirements and accreditation statement shown publicly; Admin > Announcements publishes news. Only state accreditation or recognition on the About page if the college really holds it.

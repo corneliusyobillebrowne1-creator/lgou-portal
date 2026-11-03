@@ -2,10 +2,10 @@
 <main><div class="wrap">
   <p><a href="/#courses">&larr; All courses</a></p>
   <div class="card">
-    <span class="badge <%= course.type === 'diploma' ? 'diploma' : '' %>"><%= course.type %></span>
+    <span class="badge <%= badgeClass(course.type) %>"><%= typeLabel(course.type) %></span>
     <% if (course.live) { %><span class="badge ok">Live classes in Google Classroom</span><% } %>
     <h1><%= course.title %></h1>
-    <p class="meta"><%= course.duration_weeks %> weeks<% if (lessons.length) { %> &middot; <%= lessons.length %> video lessons<% } %> &middot; Pass mark <%= course.pass_mark %>%
+    <p class="meta"><%= durationLabel(course.duration_weeks) %><% if (lessons.length) { %> &middot; <%= lessons.length %> video lessons<% } %> &middot; Pass mark <%= course.pass_mark %>%
       <% if (course.teacher_name) { %> &middot; Taught by <a href="/teachers/<%= course.teacher_id %>"><%= course.teacher_name %></a><% } %></p>
     <div class="price"><%= money(course.fee_cents) %></div>
     <p class="pre"><%= course.description || course.summary %></p>

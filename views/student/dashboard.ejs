@@ -1,6 +1,12 @@
 <%- include('../partials/header') %>
 <main><div class="wrap">
   <h1>Welcome, <%= user.full_name %></h1>
+  <p><% if (user.student_no) { %><span class="idbadge">Student no. <%= user.student_no %></span> <% } %><a class="btn ghost" href="/portal/transcript">My transcript</a></p>
+  <% if (news.length) { %>
+  <div class="card flat news"><h3>College announcements</h3>
+    <% news.forEach(n => { %><p><strong><%= n.title %></strong> <span class="muted">(<%= fmtDate(n.created_at) %>)</span><% if (n.body) { %><br><span class="pre"><%= n.body %></span><% } %></p><% }) %>
+  </div>
+  <% } %>
 
   <h2>My courses</h2>
   <% if (!enrollments.length) { %>
@@ -9,7 +15,7 @@
   <div class="grid">
   <% enrollments.forEach(e => { %>
     <article class="card">
-      <span class="badge <%= e.course_type === 'diploma' ? 'diploma' : '' %>"><%= e.course_type %></span>
+      <span class="badge <%= badgeClass(e.course_type) %>"><%= typeLabel(e.course_type) %></span>
       <% if (e.has_classroom) { %><span class="badge ok">Live classes</span><% } %>
       <h3><%= e.course_title %></h3>
       <p class="meta">Fee <%= money(e.fee_cents) %> &middot; Paid <%= money(e.paid_cents) %>
@@ -44,7 +50,7 @@
   <div class="grid">
   <% available.forEach(c => { %>
     <article class="card">
-      <span class="badge <%= c.type === 'diploma' ? 'diploma' : '' %>"><%= c.type %></span>
+      <span class="badge <%= badgeClass(c.type) %>"><%= typeLabel(c.type) %></span>
       <% if (c.live) { %><span class="badge ok">Live classes</span><% } %>
       <% if (!c.ready) { %><span class="badge warn">Coming soon</span><% } %>
       <h3><%= c.title %></h3>

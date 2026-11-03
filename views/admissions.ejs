@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+<main><div class="wrap">
+  <h1>Admissions</h1>
+  <p class="muted">Apply online in a few minutes. There is no paper form.</p>
+
+  <h2>How to apply</h2>
+  <div class="grid">
+    <div class="card flat"><h3>1. Create your account</h3><p>Sign up with your name, email and a strong password. You receive a student number.</p></div>
+    <div class="card flat"><h3>2. Choose your programme</h3><p>Pick an AA degree, a diploma or a certificate course and press Enroll.</p></div>
+    <div class="card flat"><h3>3. Pay your fee</h3><p>Pay by <%= methods.join(', ') %>. Fees may be paid in parts. The college confirms each payment.</p></div>
+    <div class="card flat"><h3>4. Study</h3><p>Join your teacher's Google Classroom or follow the video lessons. Track progress, attendance and grades in your portal.</p></div>
+    <div class="card flat"><h3>5. Graduate</h3><p>Request your qualification when you finish. After approval, download it and share the verification code.</p></div>
+  </div>
+
+  <h2>Entry requirements</h2>
+  <div class="card flat"><p class="pre"><%= siteInfo.admissions %></p></div>
+
+  <h2>Associate of Arts (AA) degrees</h2>
+  <div class="grid">
+    <% associates.forEach(c => { %><%- include('partials/course_card', { c }) %><% }) %>
+  </div>
+  <p><a class="btn red" href="/signup">Apply / Sign up</a> <a class="btn ghost" href="/#fees">Fee information</a></p>
+</div></main>
+<%- include('partials/footer') %>

@@ -8,7 +8,7 @@
     <p><button class="btn" type="submit">Verify</button></p>
   </form>
   <% if (result && result.found && result.cert.status === 'valid') { %>
-    <div class="alert ok"><strong>Valid certificate.</strong> This was issued by Liberia Gateway Online University.</div>
+    <div class="alert ok"><strong>Valid certificate.</strong> This was issued by Liberia Gateway Online College.</div>
     <table><tbody>
       <tr><th>Awarded to</th><td><%= result.cert.student_name %></td></tr>
       <tr><th>Programme</th><td><%= result.cert.course_title %> (<%= result.cert.course_type %>)</td></tr>

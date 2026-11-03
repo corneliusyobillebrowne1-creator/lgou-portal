@@ -6,7 +6,7 @@
   <% pending.forEach(e => { %>
     <div class="card">
       <h3><%= e.full_name %> <span class="muted">(<%= e.username %>)</span></h3>
-      <p><%= e.course_title %> <span class="badge <%= e.course_type === 'diploma' ? 'diploma' : '' %>"><%= e.course_type %></span><br>
+      <p><%= e.course_title %> <span class="badge <%= badgeClass(e.course_type) %>"><%= typeLabel(e.course_type) %></span><br>
       <% if (e.teacher_id) { %><% if (e.completion_recommended) { %><span class="badge ok">teacher recommended (<%= e.recommended_score %>%)</span><% } else { %><span class="badge bad">not recommended by teacher</span><% } %><% } else { %>Lessons <%= e.lesson_done %>/<%= e.lesson_total %><% } %>
       &middot; Fee <%= money(e.fee_cents) %>, paid <%= money(e.paid_cents) %>
       <% if (e.owed_cents > 0) { %><span class="badge bad">balance <%= money(e.owed_cents) %></span><% } else { %><span class="badge ok">fully paid</span><% } %></p>

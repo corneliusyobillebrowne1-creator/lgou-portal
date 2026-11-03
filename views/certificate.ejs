@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Certificate <%= cert.cert_no %> · Liberia Gateway Online University</title>
+<title>Certificate <%= cert.cert_no %> · Liberia Gateway Online College</title>
 <link rel="stylesheet" href="/style.css">
 </head>
 <body class="certpage">
@@ -13,12 +13,12 @@
 </div>
 <div class="certificate">
   <span class="crest">LG</span>
-  <h1>LIBERIA GATEWAY ONLINE UNIVERSITY</h1>
-  <div class="small">Online Diploma &amp; Certificate University</div>
-  <div class="kind">Certificate of <%= cert.course_type === 'diploma' ? 'Diploma' : 'Completion' %></div>
+  <h1>LIBERIA GATEWAY ONLINE COLLEGE</h1>
+  <div class="small">Online Diploma, Certificate &amp; AA Degree College</div>
+  <div class="kind"><%= cert.course_type === 'associate' ? 'Associate of Arts Degree' : cert.course_type === 'diploma' ? 'Diploma' : 'Certificate of Completion' %></div>
   <div>This is to certify that</div>
   <div class="name"><%= cert.student_name %></div>
-  <div>has successfully completed the <%= cert.course_type %> programme</div>
+  <div>has successfully completed the <%= cert.course_type === 'associate' ? 'associate degree' : cert.course_type %> programme</div>
   <div class="course"><%= cert.course_title %></div>
   <% if (cert.score !== null) { %><div class="small">Final assessment score: <%= cert.score %>%</div><% } %>
   <% if (cert.status === 'revoked') { %><div class="revoked">REVOKED</div><% } %>

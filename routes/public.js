@@ -2,17 +2,32 @@ const router = require('express').Router();
 const { db } = require('../lib/db');
 const { decrypt } = require('../lib/crypto');
 const { publicCourses, publicTeachers } = require('../lib/queries');
+const site = require('../lib/site');
+const { getMethods } = require('../lib/payments');
 
 router.get('/', (req, res) => {
   const courses = publicCourses();
   const fees = courses.map(c => c.fee_cents);
   res.render('home', {
     title: 'Home',
+    news: site.announcements(3),
+    associates: courses.filter(c => c.type === 'associate'),
     certificates: courses.filter(c => c.type === 'certificate'),
     diplomas: courses.filter(c => c.type === 'diploma'),
     teachers: publicTeachers(6),
     feeRange: fees.length ? { min: Math.min(...fees), max: Math.max(...fees) } : null
   });
+});
+
+router.get('/admissions', (req, res) => {
+  res.render('admissions', { title: 'Admissions', methods: getMethods().map(m => m.name), associates: publicCourses("c.type='associate'") });
+});
+
+router.get('/about', (req, res) => {
+  const courses = publicCourses();
+  res.render('about', { title: 'About the college', counts: {
+    associate: courses.filter(c => c.type === 'associate').length, diploma: courses.filter(c => c.type === 'diploma').length,
+    certificate: courses.filter(c => c.type === 'certificate').length, teachers: publicTeachers(1000).length } });
 });
 
 router.get('/courses/:id', (req, res) => {

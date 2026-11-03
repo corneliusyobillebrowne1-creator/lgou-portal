@@ -5,7 +5,7 @@
   <% if (!courses.length) { %><div class="card flat"><p>No courses are waiting for approval.</p></div><% } %>
   <% courses.forEach(c => { %>
     <div class="card">
-      <h3><%= c.title %> <span class="badge <%= c.type === 'diploma' ? 'diploma' : '' %>"><%= c.type %></span></h3>
+      <h3><%= c.title %> <span class="badge <%= badgeClass(c.type) %>"><%= typeLabel(c.type) %></span></h3>
       <p class="meta">By <a href="/admin/teachers/<%= c.teacher_id %>"><%= c.teacher_name %></a> &middot; Fee <%= money(c.fee_cents) %> &middot; <%= c.duration_weeks %> weeks &middot; Pass mark <%= c.pass_mark %>%</p>
       <p><%= c.summary %></p>
       <p class="pre"><%= c.description %></p>

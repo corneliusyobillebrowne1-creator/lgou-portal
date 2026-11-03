@@ -1,3 +1,4 @@
+const site = require('./lib/site');
 const express = require('express');
 const helmet = require('helmet');
 const session = require('express-session');
@@ -76,11 +77,15 @@ app.use((req, res, next) => {
   res.locals.homeFor = homeFor;
   res.locals.initials = initials;
   res.locals.CLASSROOM_NOTE = CLASSROOM_NOTE;
+  res.locals.typeLabel = site.typeLabel;
+  res.locals.durationLabel = site.durationLabel;
+  res.locals.badgeClass = site.badgeClass;
+  res.locals.siteInfo = site.info();
   res.locals.flash = req.session.flash || null;
   delete req.session.flash;
 
   if (req.session.userId) {
-    const u = db.prepare('SELECT id,username,role,active,full_name_enc FROM users WHERE id=?').get(req.session.userId);
+    const u = db.prepare('SELECT id,username,role,active,full_name_enc,student_no FROM users WHERE id=?').get(req.session.userId);
     if (u && u.active) {
       u.full_name = decrypt(u.full_name_enc);
       req.user = u;
@@ -126,7 +131,7 @@ app.use((err, req, res, next) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, process.env.HOST || '0.0.0.0', () => {
-  console.log(`Liberia Gateway Online University portal running on port ${PORT}`);
+  console.log(`Liberia Gateway Online College portal running on port ${PORT}`);
 });
 
 // ---- automatic daily database backup ----

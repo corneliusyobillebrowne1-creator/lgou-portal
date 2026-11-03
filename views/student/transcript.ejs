@@ -1,0 +1,24 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <div class="noprint"><p><a href="/portal">&larr; My portal</a> <button class="btn" id="printbtn" type="button">Print / Save as PDF</button></p></div>
+  <h1>Academic transcript</h1>
+  <p><strong><%= user.full_name %></strong><% if (user.student_no) { %> &middot; Student no. <strong><%= user.student_no %></strong><% } %><br>
+  Liberia Gateway Online College &middot; Generated <%= fmtDate(generated) %></p>
+  <% if (!rows.length) { %><div class="card flat"><p>You are not enrolled in any programme yet.</p></div><% } else { %>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Programme</th><th>Level</th><th>Status</th><th>Lessons</th><th>Grades</th><th>Qualification</th></tr></thead>
+    <tbody>
+    <% rows.forEach(e => { %><tr>
+      <td><%= e.course_title %></td><td><%= typeLabel(e.course_type) %></td>
+      <td><%= e.status === 'certified' ? 'Completed' : e.status === 'requested' ? 'Awaiting approval' : 'In progress' %></td>
+      <td><%= e.lesson_total ? e.lesson_done + ' / ' + e.lesson_total : '-' %></td>
+      <td><%= e.gradePct === null ? '-' : e.gradePct + '%' %></td>
+      <td><% if (e.cert && e.cert.status === 'valid') { %><%= e.cert.cert_no %> (<%= fmtDate(e.cert.issued_at) %>)<% } else if (e.cert) { %>Revoked<% } else { %>-<% } %></td>
+    </tr><% }) %>
+    </tbody>
+  </table></div>
+  <% } %>
+  <p class="muted">This transcript is a record printed from the student portal. Qualifications can be verified on the Verify page using the code on the certificate.</p>
+</div></main>
+<script src="/print.js"></script>
+<%- include('../partials/footer') %>

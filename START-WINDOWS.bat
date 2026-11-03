@@ -1,8 +1,8 @@
 @echo off
-title Liberia Gateway Online University - school portal
+title Liberia Gateway Online College - school portal
 cd /d "%~dp0"
 echo.
-echo  Liberia Gateway Online University - school portal
+echo  Liberia Gateway Online College - school portal
 echo  =================================================
 echo.
 where node >nul 2>nul

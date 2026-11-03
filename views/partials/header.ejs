@@ -3,27 +3,29 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title><%= typeof title !== 'undefined' && title ? title + ' · ' : '' %>Liberia Gateway Online University</title>
+<title><%= typeof title !== 'undefined' && title ? title + ' · ' : '' %>Liberia Gateway Online College</title>
 <link rel="stylesheet" href="/style.css">
 <link rel="icon" type="image/png" href="/logo.png">
 </head>
 <body>
 <header class="site-header">
   <div class="bar">
-    <a class="brand" href="/"><img class="logo" src="/logo.png" alt="Liberia Gateway Online University logo" width="52" height="52"><span>Liberia Gateway<br><small>Online University</small></span></a>
+    <a class="brand" href="/"><img class="logo" src="/logo.png" alt="Liberia Gateway Online College logo" width="52" height="52"><span>Liberia Gateway<br><small>Online College</small></span></a>
     <nav>
       <a href="/">Home</a>
-      <a href="/#courses">Courses</a>
+      <a href="/#courses">Programmes</a>
+      <a href="/admissions">Admissions</a>
       <a href="/teachers">Teachers</a>
+      <a href="/about">About</a>
       <a href="/teach">Teach with us</a>
-      <a href="/verify">Verify Certificate</a>
+      <a href="/verify">Verify</a>
       <% if (user) { %>
         <a href="<%= homeFor(user) %>"><%= user.role === 'admin' ? 'Admin' : user.role === 'teacher' ? 'Teacher area' : 'My Portal' %></a>
         <a href="/account">Account</a>
         <form method="post" action="/logout" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="linkbtn" type="submit">Log out (<%= user.username %>)</button></form>
       <% } else { %>
         <a href="/login">Log in</a>
-        <a href="/signup">Student sign up</a>
+        <a href="/signup">Apply / Sign up</a>
       <% } %>
     </nav>
   </div>
@@ -38,6 +40,7 @@
   <a href="/admin/courses" class="<%= currentPath.startsWith('/admin/courses') ? 'on' : '' %>">Courses &amp; YouTube</a>
   <a href="/admin/approvals" class="<%= currentPath.startsWith('/admin/approvals') ? 'on' : '' %>">Completions</a>
   <a href="/admin/certificates" class="<%= currentPath.startsWith('/admin/certificates') ? 'on' : '' %>">Certificates</a>
+  <a href="/admin/announcements" class="<%= currentPath.startsWith('/admin/announcements') ? 'on' : '' %>">Announcements</a>
   <a href="/admin/assistant" class="<%= currentPath.startsWith('/admin/assistant') ? 'on' : '' %>">AI assistant</a>
   <a href="/admin/settings" class="<%= currentPath.startsWith('/admin/settings') ? 'on' : '' %>">Settings &amp; Backups</a>
 </div></div>

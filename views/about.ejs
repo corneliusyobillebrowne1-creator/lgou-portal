@@ -1,0 +1,20 @@
+<%- include('partials/header') %>
+<main><div class="wrap">
+  <h1>About Liberia Gateway Online College</h1>
+  <div class="card flat">
+    <p>Liberia Gateway Online College is a private digital college focused on practical, affordable learning for people across Liberia. We offer Associate of Arts (AA) degrees, diploma programmes and short certificate courses, taught live by approved teachers in Google Classroom or through guided video lessons.</p>
+    <p><strong><%= counts.associate %></strong> AA degree programmes &middot; <strong><%= counts.diploma %></strong> diploma programmes &middot; <strong><%= counts.certificate %></strong> certificate courses &middot; <strong><%= counts.teachers %></strong> approved teachers</p>
+  </div>
+
+  <h2>Recognition and accreditation</h2>
+  <div class="card flat"><p class="pre"><%= siteInfo.accreditation %></p></div>
+
+  <h2>Contact</h2>
+  <div class="card flat">
+    <% if (siteInfo.contact) { %><p class="pre"><%= siteInfo.contact %></p><% } else { %><p class="muted">Contact details have not been added yet.</p><% } %>
+  </div>
+
+  <h2>Important notice</h2>
+  <div class="card flat"><p><%= DISCLAIMER %></p><p><%= CLASSROOM_NOTE %></p></div>
+</div></main>
+<%- include('partials/footer') %>

@@ -1,7 +1,7 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 echo
-echo " Liberia Gateway Online University - school portal"
+echo " Liberia Gateway Online College - school portal"
 echo " ================================================="
 echo
 openpage() { (open https://nodejs.org/en/download || xdg-open https://nodejs.org/en/download) >/dev/null 2>&1; }
