@@ -100,3 +100,5 @@ td input[type=radio]{width:18px;height:18px;accent-color:var(--navy2)}
 .news{border-left:4px solid #c9971c}
 .idbadge{display:inline-block;background:#f6d77a;color:#3d2e00;font-weight:700;border-radius:8px;padding:3px 10px;font-size:.9rem}
 @media print{.site-header,.disclaimer,footer,.cert-actions,.noprint{display:none!important}}
+
+@media(min-width:900px){.grid.quick,.grid.grid4{grid-template-columns:repeat(4,1fr)}}
