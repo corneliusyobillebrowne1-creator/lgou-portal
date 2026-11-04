@@ -129,15 +129,20 @@ app.use((err, req, res, next) => {
   res.status(500).render('error', { title: 'Something went wrong', message: 'An unexpected error occurred. Please try again.' });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, process.env.HOST || '0.0.0.0', () => {
-  console.log(`Liberia Gateway Online College portal running on port ${PORT}`);
-});
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, process.env.HOST || '0.0.0.0', () => {
+    console.log(`Liberia Gateway Online College portal running on port ${PORT}`);
+  });
 
-// ---- automatic daily database backup ----
-async function autoBackup() {
-  try { await runBackup(); } catch (e) { console.error('Auto-backup failed:', e.message); }
+  // ---- automatic daily database backup ----
+  async function autoBackup() {
+    try { await runBackup(); } catch (e) { console.error('Auto-backup failed:', e.message); }
+  }
+  const last = listBackups()[0];
+  if (!last || Date.now() - last.mtime.getTime() > 24 * 3600 * 1000) autoBackup();
+  setInterval(autoBackup, 24 * 3600 * 1000).unref();
 }
-const last = listBackups()[0];
-if (!last || Date.now() - last.mtime.getTime() > 24 * 3600 * 1000) autoBackup();
-setInterval(autoBackup, 24 * 3600 * 1000).unref();
+
+// On Vercel the app runs as a serverless function (see api/index.js), so we export it instead of listening.
+module.exports = app;
