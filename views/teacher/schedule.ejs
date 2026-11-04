@@ -1,0 +1,33 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <%- include('_tabs') %>
+  <p class="muted">Students enrolled in this course see these class times in their portal. All times are Liberia time (GMT).</p>
+  <form method="post" action="/teacher/courses/<%= course.id %>/schedule/weekly" class="card flat">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label for="class_schedule">Regular weekly class times</label>
+    <input type="text" id="class_schedule" name="class_schedule" maxlength="300" value="<%= course.class_schedule || '' %>" placeholder="e.g. Mondays and Wednesdays, 4:00 PM - 5:30 PM">
+    <p><button class="btn" type="submit">Save weekly times</button></p>
+  </form>
+
+  <form method="post" action="/teacher/courses/<%= course.id %>/schedule" class="card flat">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <strong>Add a specific class</strong>
+    <div class="row">
+      <div><label>Date</label><input type="date" name="starts_on" required value="<%= today %>"></div>
+      <div><label>Start</label><input type="time" name="start_time" required value="16:00"></div>
+      <div><label>End (optional)</label><input type="time" name="end_time"></div>
+      <div><label>Topic (optional)</label><input type="text" name="topic" maxlength="120"></div>
+      <span><button class="btn" type="submit">Add class</button></span>
+    </div>
+  </form>
+
+  <h2>Timetable</h2>
+  <% if (!sessions.length) { %><div class="card flat"><p>No classes added yet.</p></div><% } else { %>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Date</th><th>Time</th><th>Topic</th><th></th></tr></thead>
+    <tbody><% sessions.forEach(s => { %><tr><td><%= s.starts_on %></td><td><%= s.start_time %><%= s.end_time ? ' - ' + s.end_time : '' %></td><td><%= s.topic || '-' %></td>
+      <td><form method="post" action="/teacher/courses/<%= course.id %>/schedule/<%= s.id %>/delete" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn small ghost" type="submit">Remove</button></form></td></tr><% }) %></tbody>
+  </table></div>
+  <% } %>
+</div></main>
+<%- include('../partials/footer') %>

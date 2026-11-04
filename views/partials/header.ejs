@@ -8,6 +8,7 @@
 <link rel="icon" type="image/png" href="/logo.png">
 </head>
 <body>
+<% if (siteInfo.phones.length) { %><div class="topbar">Questions? Call <% siteInfo.phones.forEach((p, i) => { %><%= i ? ' or ' : '' %><a href="tel:<%= p.tel %>"><%= p.show %></a><% }) %></div><% } %>
 <header class="site-header">
   <div class="bar">
     <a class="brand" href="/"><img class="logo" src="/logo.png" alt="Liberia Gateway Online College logo" width="52" height="52"><span>Liberia Gateway<br><small>Online College</small></span></a>

@@ -84,6 +84,12 @@
     <a class="btn red" href="/teach">Apply to become a teacher</a>
   </div>
 
+  <h2 id="contact">Contact us</h2>
+  <div class="card flat">
+    <p class="pre"><%= siteInfo.contact %></p>
+    <% if (siteInfo.phones.length) { %><p class="actions"><% siteInfo.phones.forEach(p => { %><a class="btn" href="tel:<%= p.tel %>">Call <%= p.show %></a> <% }) %></p><% } %>
+  </div>
+
   <h2>About the college</h2>
   <div class="card flat">
     <p>Liberia Gateway Online College is a private digital college focused on practical, affordable learning. We offer Associate of Arts (AA) degrees, diploma programmes and certificate courses, taught live by approved teachers in Google Classroom or through guided video lessons, so you can study from anywhere in Liberia. <a href="/about">Read more about the college</a>.</p>

@@ -34,6 +34,16 @@ router.get('/transcript', (req, res) => {
   res.render('student/transcript', { title: 'Transcript', rows, generated: new Date().toISOString() });
 });
 
+// Timetable: upcoming classes set by the teachers of the courses this student is enrolled in.
+router.get('/schedule', (req, res) => {
+  const upcoming = db.prepare(`SELECT cs.*, c.title AS course_title, c.class_schedule, e.id AS enrollment_id, (c.classroom_url IS NOT NULL) AS has_classroom
+    FROM class_sessions cs JOIN courses c ON c.id=cs.course_id JOIN enrollments e ON e.course_id=c.id
+    WHERE e.user_id=? AND c.approval_status='approved' AND cs.starts_on >= date('now') ORDER BY cs.starts_on, cs.start_time LIMIT 100`).all(req.user.id);
+  const weekly = db.prepare(`SELECT c.title, c.class_schedule, e.id AS enrollment_id FROM enrollments e JOIN courses c ON c.id=e.course_id
+    WHERE e.user_id=? AND c.class_schedule IS NOT NULL AND c.class_schedule<>''`).all(req.user.id);
+  res.render('student/schedule', { title: 'Class timetable', upcoming, weekly });
+});
+
 router.post('/enroll/:courseId', (req, res) => {
   const course = publicCourses('c.id=?', [Number(req.params.courseId)])[0];
   if (!course) return res.status(404).render('error', { title: 'Not found', message: 'Course not found or not open for enrolment.' });

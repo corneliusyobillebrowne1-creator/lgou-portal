@@ -9,6 +9,7 @@
       <% if (course.teacher_name) { %> &middot; Taught by <a href="/teachers/<%= course.teacher_id %>"><%= course.teacher_name %></a><% } %></p>
     <div class="price"><%= money(course.fee_cents) %></div>
     <p class="pre"><%= course.description || course.summary %></p>
+    <% if (course.class_schedule) { %><p><strong>Class times:</strong> <%= course.class_schedule %> <span class="muted">(Liberia time)</span></p><% } %>
     <% if (course.live) { %><p class="muted">After your fee is confirmed, a button in your student portal opens this course's Google Classroom for live lessons, quizzes and assignments.</p><% } %>
 
     <% if (!course.ready) { %>

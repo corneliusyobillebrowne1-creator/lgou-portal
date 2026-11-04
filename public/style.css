@@ -102,3 +102,5 @@ td input[type=radio]{width:18px;height:18px;accent-color:var(--navy2)}
 @media print{.site-header,.disclaimer,footer,.cert-actions,.noprint{display:none!important}}
 
 @media(min-width:900px){.grid.quick,.grid.grid4{grid-template-columns:repeat(4,1fr)}}
+
+.topbar{background:#c9971c;color:#1a1200;text-align:center;font-size:.9rem;padding:5px 10px;font-weight:600}.topbar a{color:#1a1200}

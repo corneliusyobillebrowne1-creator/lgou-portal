@@ -19,6 +19,7 @@
   <div class="grid">
     <% associates.forEach(c => { %><%- include('partials/course_card', { c }) %><% }) %>
   </div>
+  <p class="muted">Need help applying? <%= siteInfo.contact %></p>
   <p><a class="btn red" href="/signup">Apply / Sign up</a> <a class="btn ghost" href="/#fees">Fee information</a></p>
 </div></main>
 <%- include('partials/footer') %>

@@ -221,6 +221,36 @@ router.post('/courses/:id/recommend/:eid', (req, res) => {
 // ---------- attendance ----------
 const ATT = ['present', 'late', 'absent', 'excused'];
 
+// ---------- class times (students see these in their portal) ----------
+const validTime = (t) => /^([01]\d|2[0-3]):[0-5]\d$/.test(t);
+router.get('/courses/:id/schedule', (req, res) => {
+  const course = myCourse(req, res); if (!course) return;
+  const sessions = db.prepare('SELECT * FROM class_sessions WHERE course_id=? ORDER BY starts_on DESC, start_time DESC LIMIT 100').all(course.id);
+  res.render('teacher/schedule', { title: 'Class times - ' + course.title, course, tab: 'schedule', sessions, today: new Date().toISOString().slice(0, 10) });
+});
+router.post('/courses/:id/schedule/weekly', (req, res) => {
+  const course = myCourse(req, res); if (!course) return;
+  db.prepare('UPDATE courses SET class_schedule=? WHERE id=? AND teacher_id=?').run(String(req.body.class_schedule || '').trim().slice(0, 300) || null, course.id, req.user.id);
+  audit(req.user.id, 'class_schedule_updated', course.title, req.ip);
+  flash(req, 'ok', 'Weekly class times saved. Students can see them in their portal.');
+  res.redirect(`/teacher/courses/${course.id}/schedule`);
+});
+router.post('/courses/:id/schedule', (req, res) => {
+  const course = myCourse(req, res); if (!course) return;
+  const date = String(req.body.starts_on || ''), start = String(req.body.start_time || ''), end = String(req.body.end_time || '');
+  const topic = String(req.body.topic || '').trim().slice(0, 120);
+  if (!validDate(date) || !validTime(start) || (end && !validTime(end))) { flash(req, 'warn', 'Enter a valid date and start time (end time is optional).'); return res.redirect(`/teacher/courses/${course.id}/schedule`); }
+  db.prepare('INSERT INTO class_sessions (course_id,starts_on,start_time,end_time,topic) VALUES (?,?,?,?,?)').run(course.id, date, start, end || null, topic);
+  audit(req.user.id, 'class_session_added', `${course.title} ${date} ${start}`, req.ip);
+  flash(req, 'ok', 'Class added to the timetable.');
+  res.redirect(`/teacher/courses/${course.id}/schedule`);
+});
+router.post('/courses/:id/schedule/:sid/delete', (req, res) => {
+  const course = myCourse(req, res); if (!course) return;
+  db.prepare('DELETE FROM class_sessions WHERE id=? AND course_id=?').run(Number(req.params.sid), course.id);
+  res.redirect(`/teacher/courses/${course.id}/schedule`);
+});
+
 router.get('/courses/:id/attendance', (req, res) => {
   const course = myCourse(req, res); if (!course) return;
   const sessions = db.prepare(`SELECT s.*,

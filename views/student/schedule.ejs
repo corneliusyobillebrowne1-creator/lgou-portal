@@ -1,0 +1,19 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <p><a href="/portal">&larr; My portal</a></p>
+  <h1>Class timetable</h1>
+  <p class="muted">Times are set by your teachers and shown in Liberia time (GMT). To join a live class, use the Join button after your fee is confirmed.</p>
+  <% if (weekly.length) { %>
+  <h2>Regular weekly classes</h2>
+  <div class="grid"><% weekly.forEach(w => { %><div class="card flat"><h3><%= w.title %></h3><p><%= w.class_schedule %></p></div><% }) %></div>
+  <% } %>
+  <h2>Upcoming classes</h2>
+  <% if (!upcoming.length) { %><div class="card flat"><p>No upcoming classes have been scheduled yet. Check again soon.</p></div><% } else { %>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Date</th><th>Time</th><th>Course</th><th>Topic</th><th></th></tr></thead>
+    <tbody><% upcoming.forEach(s => { %><tr><td><%= fmtDate(s.starts_on) %></td><td><%= s.start_time %><%= s.end_time ? ' - ' + s.end_time : '' %></td><td><%= s.course_title %></td><td><%= s.topic || '-' %></td>
+      <td><% if (s.has_classroom) { %><a class="btn small" href="/portal/classroom/<%= s.enrollment_id %>">Join class</a><% } %></td></tr><% }) %></tbody>
+  </table></div>
+  <% } %>
+</div></main>
+<%- include('../partials/footer') %>

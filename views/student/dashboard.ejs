@@ -1,7 +1,7 @@
 <%- include('../partials/header') %>
 <main><div class="wrap">
   <h1>Welcome, <%= user.full_name %></h1>
-  <p><% if (user.student_no) { %><span class="idbadge">Student no. <%= user.student_no %></span> <% } %><a class="btn ghost" href="/portal/transcript">My transcript</a></p>
+  <p><% if (user.student_no) { %><span class="idbadge">Student no. <%= user.student_no %></span> <% } %><a class="btn" href="/portal/schedule">Class timetable</a> <a class="btn ghost" href="/portal/transcript">My transcript</a></p>
   <% if (news.length) { %>
   <div class="card flat news"><h3>College announcements</h3>
     <% news.forEach(n => { %><p><strong><%= n.title %></strong> <span class="muted">(<%= fmtDate(n.created_at) %>)</span><% if (n.body) { %><br><span class="pre"><%= n.body %></span><% } %></p><% }) %>
@@ -18,6 +18,7 @@
       <span class="badge <%= badgeClass(e.course_type) %>"><%= typeLabel(e.course_type) %></span>
       <% if (e.has_classroom) { %><span class="badge ok">Live classes</span><% } %>
       <h3><%= e.course_title %></h3>
+      <% if (e.class_schedule) { %><p class="meta"><strong>Class times:</strong> <%= e.class_schedule %></p><% } %>
       <p class="meta">Fee <%= money(e.fee_cents) %> &middot; Paid <%= money(e.paid_cents) %>
         <% if (e.owed_cents > 0) { %>&middot; <strong>Balance <%= money(e.owed_cents) %></strong><% } %></p>
 
