@@ -104,3 +104,5 @@ td input[type=radio]{width:18px;height:18px;accent-color:var(--navy2)}
 @media(min-width:900px){.grid.quick,.grid.grid4{grid-template-columns:repeat(4,1fr)}}
 
 .topbar{background:#c9971c;color:#1a1200;text-align:center;font-size:.9rem;padding:5px 10px;font-weight:600}.topbar a{color:#1a1200}
+
+.certlogo{display:block;margin:0 auto 6px;width:90px;height:90px}
