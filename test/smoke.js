@@ -86,6 +86,16 @@ function client() {
   r = await anon.get('/');
   check('homepage says College and lists AA degrees', r.text.includes('Online College') && !r.text.includes('Online University') && r.text.includes('Associate of Arts (AA) in Business Administration'));
   for (const pth of ['/admissions', '/about']) { r = await anon.get(pth); check(pth + ' page opens', r.status === 200 && r.text.includes('Online College')); }
+  r = await anon.get('/manifest.webmanifest');
+  let man = null; try { man = JSON.parse(r.text); } catch (e) {}
+  check('app manifest is valid (installable)', r.status === 200 && man && man.display === 'standalone' && man.icons.some(i => i.sizes === '512x512') && man.start_url === '/portal');
+  r = await anon.get('/sw.js');
+  check('service worker is served and never caches pages', r.status === 200 && r.text.includes("req.mode === 'navigate'") && !r.text.includes("'/portal'"));
+  r = await anon.get('/offline.html');
+  check('offline page exists', r.status === 200 && r.text.includes('You are offline'));
+  for (const ic of ['/icon-192.png', '/icon-512.png', '/apple-touch-icon.png', '/icon-maskable-512.png']) { r = await anon.get(ic); check('icon ' + ic, r.status === 200); }
+  r = await anon.get('/');
+  check('pages link the manifest and install script', r.text.includes('rel="manifest"') && r.text.includes('/pwa.js') && r.text.includes('theme-color'));
   r = await anon.get('/filter.js');
   check('search script is served as an external file (CSP-safe)', r.status === 200 && r.text.includes('coursesearch'));
   r = await stu.post('/portal/enroll/5', {}, '/portal');

@@ -43,7 +43,13 @@ app.use(helmet({
 }));
 
 app.use(express.urlencoded({ extended: false, limit: '20kb' }));
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1h' }));
+app.use(express.static(path.join(__dirname, 'public'), {
+  maxAge: '1h',
+  setHeaders: (res, file) => {
+    if (/[\\/](sw\.js|manifest\.webmanifest)$/.test(file)) res.setHeader('Cache-Control', 'no-cache');
+    if (/manifest\.webmanifest$/.test(file)) res.setHeader('Content-Type', 'application/manifest+json');
+  }
+}));
 
 app.use(rateLimit({ windowMs: 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false }));
 

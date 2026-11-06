@@ -118,3 +118,6 @@ Programmes come in three levels: certificate, diploma and Associate of Arts (AA)
 
 ## Email
 Receipts, "selected and approved" notices and certificate/diploma/AA PDFs are emailed to students. See EMAIL-SETUP.md. Tested with simulated email services (`node test/email_smoke.js`), not against the real Brevo service.
+
+## Installable app (PWA)
+The site is a Progressive Web App: on Android (Chrome) an "Install the college app" button appears in the footer; on iPhone use Share > Add to Home Screen. It opens full-screen with the college icon. The service worker caches only public static files, never student pages or data. HTTPS is required (any normal host provides it; localhost also works).
