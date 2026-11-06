@@ -11,6 +11,8 @@ const { runBackup, listBackups } = require('../lib/backup');
 router.use(requireAdmin);
 
 const { methodNames, saveMethods, methodsText } = require('../lib/payments');
+const mailer = require('../lib/mailer');
+const emails = require('../lib/emails');
 const flash = (req, type, msg) => { req.session.flash = { type, msg }; };
 const notFound = (res, what) => res.status(404).render('error', { title: 'Not found', message: what + ' not found.' });
 
@@ -94,17 +96,18 @@ router.post('/enrollments/:id/fee', (req, res) => {
   res.redirect('/admin/students/' + e.user_id);
 });
 
-router.post('/enrollments/:id/payment', (req, res) => {
+router.post('/enrollments/:id/payment', async (req, res) => {
   const e = db.prepare('SELECT * FROM enrollments WHERE id=?').get(Number(req.params.id));
   if (!e) return notFound(res, 'Enrollment');
   const amount = parseMoney(req.body.amount);
   const method = String(req.body.method || '');
   const ref = String(req.body.reference || '').trim() || 'Recorded by admin';
   if (!amount || !methodNames().includes(method)) { flash(req, 'warn', 'Enter a valid amount and payment method.'); return res.redirect('/admin/students/' + e.user_id); }
-  db.prepare(`INSERT INTO payments (enrollment_id,user_id,amount_cents,method,reference_enc,status,reviewed_by,reviewed_at)
+  const ins = db.prepare(`INSERT INTO payments (enrollment_id,user_id,amount_cents,method,reference_enc,status,reviewed_by,reviewed_at)
     VALUES (?,?,?,?,?,'confirmed',?,datetime('now'))`).run(e.id, e.user_id, amount, method, encrypt(ref), req.user.id);
   audit(req.user.id, 'payment_recorded', `enrollment ${e.id}: ${amount} cents`, req.ip);
-  flash(req, 'ok', 'Payment recorded and confirmed.');
+  const mr = await emails.emailReceipt(Number(ins.lastInsertRowid), emails.baseUrl(req));
+  flash(req, 'ok', 'Payment recorded and confirmed.' + emails.note(mr, 'Receipt'));
   res.redirect('/admin/students/' + e.user_id);
 });
 
@@ -120,12 +123,14 @@ router.get('/payments', (req, res) => {
 });
 
 function reviewPayment(decision) {
-  return (req, res) => {
+  return async (req, res) => {
     const p = db.prepare("SELECT * FROM payments WHERE id=? AND status='pending'").get(Number(req.params.id));
     if (!p) { flash(req, 'warn', 'That payment is no longer pending.'); return res.redirect('/admin/payments'); }
     db.prepare("UPDATE payments SET status=?, reviewed_by=?, reviewed_at=datetime('now') WHERE id=?").run(decision, req.user.id, p.id);
     audit(req.user.id, 'payment_' + decision, `payment ${p.id} (${p.amount_cents} cents)`, req.ip);
-    flash(req, 'ok', 'Payment ' + decision + '.');
+    let extra = '';
+    if (decision === 'confirmed') extra = emails.note(await emails.emailReceipt(p.id, emails.baseUrl(req)), 'Receipt');
+    flash(req, 'ok', 'Payment ' + decision + '.' + extra);
     res.redirect('/admin/payments');
   };
 }
@@ -290,7 +295,7 @@ router.get('/approvals', (req, res) => {
   res.render('admin/approvals', { title: 'Approve Completions', pending });
 });
 
-router.post('/approvals/:id/approve', (req, res) => {
+router.post('/approvals/:id/approve', async (req, res) => {
   const e = enrollmentRows('e.id=?', [Number(req.params.id)])[0];
   if (!e || e.status !== 'requested') { flash(req, 'warn', 'That request is no longer pending.'); return res.redirect('/admin/approvals'); }
   const score = parseInt(req.body.score, 10);
@@ -308,7 +313,7 @@ router.post('/approvals/:id/approve', (req, res) => {
   const u = db.prepare('SELECT full_name_enc FROM users WHERE id=?').get(e.user_id);
   const tx = db.transaction(() => {
     db.prepare('INSERT INTO exam_results (enrollment_id,score,pass_mark,passed,recorded_by) VALUES (?,?,?,1,?)').run(e.id, score, e.pass_mark, req.user.id);
-    const certNo = 'LGOU-' + new Date().getUTCFullYear() + '-' + crypto.randomBytes(3).toString('hex').toUpperCase();
+    const certNo = 'LGOC-' + new Date().getUTCFullYear() + '-' + crypto.randomBytes(3).toString('hex').toUpperCase();
     db.prepare(`INSERT INTO certificates (enrollment_id,cert_no,verify_code,student_name_enc,course_title,course_type,score,issued_by)
       VALUES (?,?,?,?,?,?,?,?)`).run(e.id, certNo, crypto.randomBytes(8).toString('hex'), u.full_name_enc, e.course_title, e.course_type, score, req.user.id);
     db.prepare("UPDATE enrollments SET status='certified' WHERE id=?").run(e.id);
@@ -316,7 +321,9 @@ router.post('/approvals/:id/approve', (req, res) => {
   });
   const certNo = tx();
   audit(req.user.id, 'certificate_issued', `${certNo} (enrollment ${e.id})`, req.ip);
-  flash(req, 'ok', 'Approved. Certificate ' + certNo + ' has been issued.');
+  const cid = db.prepare('SELECT id FROM certificates WHERE cert_no=?').get(certNo).id;
+  const mr = await emails.emailCertificate(cid, emails.baseUrl(req));
+  flash(req, 'ok', 'Approved. Certificate ' + certNo + ' has been issued.' + emails.note(mr, 'Certificate PDF'));
   res.redirect('/admin/certificates');
 });
 
@@ -342,6 +349,13 @@ router.get('/certificates/:id', (req, res) => {
   res.render('certificate', { cert: { ...c, student_name: decrypt(c.student_name_enc) }, baseUrl: req.protocol + '://' + req.get('host') });
 });
 
+router.post('/certificates/:id/email', async (req, res) => {
+  const r = await emails.emailCertificate(Number(req.params.id), emails.baseUrl(req));
+  audit(req.user.id, 'certificate_emailed', 'certificate ' + req.params.id, req.ip);
+  flash(req, r.ok ? 'ok' : 'warn', r.ok ? 'Certificate emailed to the student.' : 'Not sent: ' + r.error);
+  res.redirect('/admin/certificates');
+});
+
 router.post('/certificates/:id/toggle', (req, res) => {
   const c = db.prepare('SELECT * FROM certificates WHERE id=?').get(Number(req.params.id));
   if (!c) return notFound(res, 'Certificate');
@@ -350,6 +364,28 @@ router.post('/certificates/:id/toggle', (req, res) => {
   audit(req.user.id, 'certificate_' + next, c.cert_no, req.ip);
   flash(req, 'ok', `Certificate ${c.cert_no} is now ${next}.`);
   res.redirect('/admin/certificates');
+});
+
+// ---------- email: test, log, resend ----------
+router.post('/email/test', async (req, res) => {
+  const to = String(req.body.to || '').trim();
+  if (!mailer.validEmail(to)) { flash(req, 'warn', 'Enter a valid email address to send the test to.'); return res.redirect('/admin/settings'); }
+  const r = await mailer.send({ to, toName: 'Test', subject: 'Test email from Liberia Gateway Online College', text: 'This is a test. Your email settings work.', html: '<p>This is a test. Your email settings work.</p>' });
+  audit(req.user.id, 'email_test', r.ok ? 'ok' : r.error, req.ip);
+  flash(req, r.ok ? 'ok' : 'warn', r.ok ? 'Test email sent. Check the inbox (and spam folder).' : r.error);
+  res.redirect('/admin/settings');
+});
+router.get('/emails', (req, res) => {
+  const log = db.prepare('SELECT l.*, u.username FROM email_log l LEFT JOIN users u ON u.id=l.user_id ORDER BY l.id DESC LIMIT 200').all();
+  res.render('admin/emails', { title: 'Emails', log, mail: mailer.status() });
+});
+router.post('/emails/:id/resend', async (req, res) => {
+  const l = db.prepare('SELECT * FROM email_log WHERE id=?').get(Number(req.params.id));
+  if (!l || !['receipt', 'certificate'].includes(l.kind)) { flash(req, 'warn', 'That email cannot be resent.'); return res.redirect('/admin/emails'); }
+  const r = l.kind === 'receipt' ? await emails.emailReceipt(l.ref_id, emails.baseUrl(req)) : await emails.emailCertificate(l.ref_id, emails.baseUrl(req));
+  audit(req.user.id, 'email_resent', l.kind + ' ' + l.ref_id, req.ip);
+  flash(req, r.ok ? 'ok' : 'warn', r.ok ? 'Email sent again.' : 'Not sent: ' + r.error);
+  res.redirect('/admin/emails');
 });
 
 // ---------- announcements ----------
@@ -373,7 +409,7 @@ router.post('/announcements/:id/delete', (req, res) => {
 // ---------- settings & backups ----------
 router.get('/settings', (req, res) => {
   res.render('admin/settings', {
-    title: 'Settings & Backups', instructions: getSetting('payment_instructions'), methodsText: methodsText(), site: require('../lib/site').info(), backups: listBackups(),
+    title: 'Settings & Backups', instructions: getSetting('payment_instructions'), methodsText: methodsText(), mail: mailer.status(), site: require('../lib/site').info(), backups: listBackups(),
     maxFee: (parseInt(getSetting('teacher_max_fee_cents', '5000'), 10) / 100).toFixed(2)
   });
 });
@@ -387,6 +423,7 @@ router.post('/settings', (req, res) => {
   if (has('college_contact')) txt('college_contact', 600);
   if (has('admission_requirements')) txt('admission_requirements', 1500);
   if (has('accreditation_statement')) txt('accreditation_statement', 1200);
+  if (has('email_provider')) mailer.save(b);
   audit(req.user.id, 'settings_updated', Object.keys(b).filter(k => k !== '_csrf').join(','), req.ip);
   flash(req, 'ok', 'Settings saved.');
   res.redirect('/admin/settings');

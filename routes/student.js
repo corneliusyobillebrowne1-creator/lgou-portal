@@ -5,6 +5,7 @@ const { requireStudent } = require('../lib/auth');
 const { enrollmentRows, publicCourses, PUBLIC_OK } = require('../lib/queries');
 const { parseMoney } = require('../lib/util');
 const site = require('../lib/site');
+const emails = require('../lib/emails');
 
 router.use(requireStudent);
 
@@ -160,6 +161,18 @@ router.post('/request-certificate/:id', (req, res) => {
     msg = { type: 'ok', msg: 'Certificate requested. The school will review your studies.' };
   }
   req.session.flash = msg;
+  res.redirect('/portal');
+});
+
+// Student asks for another copy of their qualification by email (limited to once every 5 minutes per certificate).
+router.post('/email-certificate/:id', async (req, res) => {
+  const e = myEnrollment(req, res); if (!e) return;
+  const cert = db.prepare("SELECT id FROM certificates WHERE enrollment_id=? AND status='valid'").get(e.id);
+  if (!cert) { req.session.flash = { type: 'warn', msg: 'No certificate has been issued for this course yet.' }; return res.redirect('/portal'); }
+  const recent = db.prepare("SELECT 1 FROM email_log WHERE kind='certificate' AND ref_id=? AND created_at > datetime('now','-5 minutes')").get(cert.id);
+  if (recent) { req.session.flash = { type: 'warn', msg: 'A copy was sent a moment ago. Please check your inbox and spam folder, or try again in a few minutes.' }; return res.redirect('/portal'); }
+  const r = await emails.emailCertificate(cert.id, emails.baseUrl(req));
+  req.session.flash = r.ok ? { type: 'ok', msg: 'Your certificate has been sent to your email address.' } : { type: 'warn', msg: 'We could not send the email right now. You can still open and print the certificate here, or contact the college office.' };
   res.redirect('/portal');
 });
 

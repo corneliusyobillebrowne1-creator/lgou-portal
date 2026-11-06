@@ -115,3 +115,6 @@ Admin > AI assistant. Paste an Anthropic API key (stored encrypted; usage is bil
 
 ## College levels and portal features
 Programmes come in three levels: certificate, diploma and Associate of Arts (AA) degree (admin chooses the level when adding a course). Public pages: Home, Admissions, About, Teachers, Verify. Students get a student number, transcript and announcements. Admin > Settings holds the contact details, entry requirements and accreditation statement shown publicly; Admin > Announcements publishes news. Only state accreditation or recognition on the About page if the college really holds it.
+
+## Email
+Receipts, "selected and approved" notices and certificate/diploma/AA PDFs are emailed to students. See EMAIL-SETUP.md. Tested with simulated email services (`node test/email_smoke.js`), not against the real Brevo service.

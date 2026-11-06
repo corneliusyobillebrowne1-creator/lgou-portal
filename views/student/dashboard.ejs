@@ -37,7 +37,8 @@
             <form method="post" action="/portal/request-certificate/<%= e.id %>" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn red" type="submit">Request certificate</button></form>
           <% } %>
           <% if (e.status === 'requested') { %><span class="badge warn">Certificate request under review</span><% } %>
-          <% if (e.status === 'certified') { %><a class="btn ok" href="/portal/certificate/<%= e.id %>">View certificate</a><% } %>
+          <% if (e.status === 'certified') { %><a class="btn ok" href="/portal/certificate/<%= e.id %>">View certificate</a>
+            <form method="post" action="/portal/email-certificate/<%= e.id %>" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn ghost" type="submit">Email me a copy</button></form><% } %>
         </div>
         <% if (e.teacher_id && e.status === 'enrolled' && !e.eligible) { %><p class="muted">Your teacher will recommend you for the certificate when you have completed the course.</p><% } %>
         <% if (e.status === 'enrolled' && e.request_note) { %><p class="alert warn">School note: <%= e.request_note %></p><% } %>

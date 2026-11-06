@@ -13,6 +13,7 @@
         <td><span class="badge <%= c.status === 'valid' ? 'ok' : 'bad' %>"><%= c.status %></span></td>
         <td><div class="actions">
           <a class="btn small" href="/admin/certificates/<%= c.id %>">View / print</a>
+          <% if (c.status === 'valid') { %><form method="post" action="/admin/certificates/<%= c.id %>/email" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn small" type="submit">Email to student</button></form><% } %>
           <form method="post" action="/admin/certificates/<%= c.id %>/toggle" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn small ghost" type="submit"><%= c.status === 'valid' ? 'Revoke' : 'Restore' %></button></form>
         </div></td>
       </tr>

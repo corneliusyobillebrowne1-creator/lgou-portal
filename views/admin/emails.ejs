@@ -1,0 +1,17 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <h1>Emails sent to students</h1>
+  <p>Status: <strong><%= mail.ready ? 'Email is set up' : 'Email is NOT set up' %></strong> &middot; <a href="/admin/settings">Email settings</a></p>
+  <p class="muted">Receipts are sent when a payment is confirmed. Certificates, diplomas and AA degrees are sent when you approve completion. If an email failed, fix the settings and press Resend.</p>
+  <% if (!log.length) { %><div class="card flat"><p>No emails yet.</p></div><% } else { %>
+  <div class="tablewrap"><table>
+    <thead><tr><th>When (UTC)</th><th>Student</th><th>To</th><th>Subject</th><th>Result</th><th></th></tr></thead>
+    <tbody><% log.forEach(l => { %><tr>
+      <td><%= l.created_at %></td><td><%= l.username || '-' %></td><td><%= l.to_masked || '-' %></td><td><%= l.subject || l.kind %></td>
+      <td><span class="badge <%= l.status === 'sent' ? 'ok' : 'bad' %>"><%= l.status %></span><% if (l.error) { %><br><span class="muted"><%= l.error %></span><% } %></td>
+      <td><% if (['receipt','certificate'].includes(l.kind) && l.ref_id) { %><form method="post" action="/admin/emails/<%= l.id %>/resend"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn small ghost" type="submit">Resend</button></form><% } %></td>
+    </tr><% }) %></tbody>
+  </table></div>
+  <% } %>
+</div></main>
+<%- include('../partials/footer') %>

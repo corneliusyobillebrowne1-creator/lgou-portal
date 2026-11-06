@@ -28,6 +28,35 @@
     <p><button class="btn" type="submit">Save college information</button></p>
   </form>
 
+  <h2>Email (receipts and certificates)</h2>
+  <form method="post" action="/admin/settings" class="card" autocomplete="off">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <p>Status: <strong><%= mail.ready ? 'Ready. Students get receipts and certificates by email.' : 'Not set up. No emails are sent yet.' %></strong></p>
+    <p class="muted">Recommended: a free <strong>Brevo</strong> account (brevo.com). Verify your sender email there, create an API key, and paste it below. It works on free hosting. Any normal SMTP mail server also works (some free hosts block SMTP).</p>
+    <label for="email_provider">How to send</label>
+    <select id="email_provider" name="email_provider">
+      <option value="off" <%= mail.provider === 'off' ? 'selected' : '' %>>Off</option>
+      <option value="brevo" <%= mail.provider === 'brevo' ? 'selected' : '' %>>Brevo (HTTPS API) - recommended</option>
+      <option value="smtp" <%= mail.provider === 'smtp' ? 'selected' : '' %>>SMTP server</option>
+    </select>
+    <label for="email_from_name">Sender name</label><input type="text" id="email_from_name" name="email_from_name" maxlength="80" value="<%= mail.fromName %>">
+    <label for="email_from_address">Sender email address (must be verified with your email service)</label><input type="email" id="email_from_address" name="email_from_address" maxlength="254" value="<%= mail.fromEmail %>">
+    <label for="email_brevo_key">Brevo API key <%= mail.hasBrevoKey ? '(saved - leave empty to keep it)' : '' %></label><input type="password" id="email_brevo_key" name="email_brevo_key" autocomplete="off" placeholder="<%= mail.hasBrevoKey ? '••••••••' : 'xkeysib-...' %>">
+    <details><summary>SMTP settings (only if you chose SMTP)</summary>
+      <label for="smtp_host">SMTP host</label><input type="text" id="smtp_host" name="smtp_host" maxlength="200" value="<%= mail.smtp.host %>" placeholder="smtp.example.com">
+      <label for="smtp_port">Port</label><input type="number" id="smtp_port" name="smtp_port" value="<%= mail.smtp.port %>">
+      <label><input type="checkbox" name="smtp_secure" value="1" <%= mail.smtp.secure ? 'checked' : '' %>> Use SSL/TLS (usually port 465)</label>
+      <label for="smtp_user">SMTP username</label><input type="text" id="smtp_user" name="smtp_user" maxlength="200" value="<%= mail.smtp.user %>" autocomplete="off">
+      <label for="smtp_pass">SMTP password <%= mail.hasSmtpPass ? '(saved - leave empty to keep it)' : '' %></label><input type="password" id="smtp_pass" name="smtp_pass" autocomplete="off">
+    </details>
+    <p><button class="btn" type="submit">Save email settings</button> <a class="btn ghost" href="/admin/emails">View sent emails</a></p>
+  </form>
+  <form method="post" action="/admin/email/test" class="card">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label for="test_to">Send a test email to</label><input type="email" id="test_to" name="to" required maxlength="254">
+    <p><button class="btn" type="submit">Send test email</button></p>
+  </form>
+
   <h2>Database backups</h2>
   <div class="card">
     <p>A backup is created automatically every 24 hours (newest 14 are kept in the <code>backups</code> folder). You can also make one now.</p>
