@@ -16,13 +16,14 @@ const { runBackup, listBackups } = require('./lib/backup');
 const isProd = process.env.NODE_ENV === 'production';
 const app = express();
 
-if (process.env.TRUST_PROXY) app.set('trust proxy', Number(process.env.TRUST_PROXY) || 1);
+// Hosts like Render and Vercel put a proxy in front; trust it so HTTPS detection and client IPs are right.
+if (process.env.TRUST_PROXY || process.env.VERCEL) app.set('trust proxy', Number(process.env.TRUST_PROXY) || 1);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.disable('x-powered-by');
 
 // ---- force HTTPS everywhere in production (needs TRUST_PROXY so the host's X-Forwarded-Proto is believed) ----
-const forceHttps = process.env.FORCE_HTTPS === 'true' || (isProd && !!process.env.TRUST_PROXY && process.env.FORCE_HTTPS !== 'false');
+const forceHttps = process.env.FORCE_HTTPS === 'true' || (isProd && !!(process.env.TRUST_PROXY || process.env.VERCEL) && process.env.FORCE_HTTPS !== 'false');
 if (forceHttps) {
   app.use((req, res, next) => {
     if (req.secure) return next();
