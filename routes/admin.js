@@ -77,7 +77,8 @@ router.post('/students/:id/reset-password', async (req, res, next) => {
     const u = db.prepare("SELECT * FROM users WHERE id=? AND role='student'").get(Number(req.params.id));
     if (!u) return notFound(res, 'Student');
     const temp = crypto.randomBytes(6).toString('base64url') + '7';
-    db.prepare('UPDATE users SET password_hash=?, failed_count=0, locked_until=0 WHERE id=?').run(await bcrypt.hash(temp, 12), u.id);
+    db.prepare('UPDATE users SET password_hash=?, failed_count=0, locked_until=0, must_change=1 WHERE id=?').run(await bcrypt.hash(temp, 12), u.id);
+    db.prepare("DELETE FROM sessions WHERE json_extract(data,'$.userId')=?").run(u.id);
     audit(req.user.id, 'student_password_reset', u.username, req.ip);
     flash(req, 'ok', `Temporary password for ${u.username}: ${temp}  (give it to the student and ask them to change it under My account)`);
     res.redirect('/admin/students/' + u.id);
@@ -225,7 +226,8 @@ router.post('/teachers/:id/reset-password', async (req, res, next) => {
     const u = db.prepare("SELECT * FROM users WHERE id=? AND role='teacher'").get(Number(req.params.id));
     if (!u) return notFound(res, 'Teacher');
     const temp = crypto.randomBytes(6).toString('base64url') + '7';
-    db.prepare('UPDATE users SET password_hash=?, failed_count=0, locked_until=0 WHERE id=?').run(await bcrypt.hash(temp, 12), u.id);
+    db.prepare('UPDATE users SET password_hash=?, failed_count=0, locked_until=0, must_change=1 WHERE id=?').run(await bcrypt.hash(temp, 12), u.id);
+    db.prepare("DELETE FROM sessions WHERE json_extract(data,'$.userId')=?").run(u.id);
     audit(req.user.id, 'teacher_password_reset', u.username, req.ip);
     flash(req, 'ok', `Temporary password for ${u.username}: ${temp}  (give it to the teacher and ask them to change it under Account)`);
     res.redirect('/admin/teachers/' + u.id);

@@ -118,7 +118,9 @@ router.post('/account', requireLogin, async (req, res, next) => {
     if (pw !== String(req.body.confirm || '')) return fail('The new passwords do not match.');
     const pwErr = passwordProblem(pw);
     if (pwErr) return fail(pwErr);
-    db.prepare('UPDATE users SET password_hash=? WHERE id=?').run(await bcrypt.hash(pw, 12), u.id);
+    if (pw === cur) return fail('Choose a password different from the current one.');
+    db.prepare('UPDATE users SET password_hash=?, must_change=0 WHERE id=?').run(await bcrypt.hash(pw, 12), u.id);
+    db.prepare("DELETE FROM sessions WHERE json_extract(data,'$.userId')=? AND sid<>?").run(u.id, req.sessionID); // sign out other devices
     audit(u.id, 'password_changed', null, req.ip);
     req.session.flash = { type: 'ok', msg: 'Your password has been changed.' };
     res.redirect(homeFor(u));

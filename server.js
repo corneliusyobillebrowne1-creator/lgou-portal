@@ -21,6 +21,16 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.disable('x-powered-by');
 
+// ---- force HTTPS everywhere in production (needs TRUST_PROXY so the host's X-Forwarded-Proto is believed) ----
+const forceHttps = process.env.FORCE_HTTPS === 'true' || (isProd && !!process.env.TRUST_PROXY && process.env.FORCE_HTTPS !== 'false');
+if (forceHttps) {
+  app.use((req, res, next) => {
+    if (req.secure) return next();
+    if (req.method === 'GET' || req.method === 'HEAD') return res.redirect(301, 'https://' + req.headers.host + req.originalUrl);
+    return res.status(400).send('HTTPS is required.');
+  });
+}
+
 // ---- security headers (CSP allows only our own files + the YouTube player) ----
 app.use(helmet({
   contentSecurityPolicy: {
@@ -38,6 +48,7 @@ app.use(helmet({
       upgradeInsecureRequests: isProd ? [] : null
     }
   },
+  hsts: forceHttps ? { maxAge: 31536000, includeSubDomains: true, preload: false } : false,
   referrerPolicy: { policy: 'strict-origin-when-cross-origin' }, // YouTube embeds need a referrer
   crossOriginEmbedderPolicy: false
 }));
@@ -52,6 +63,9 @@ app.use(express.static(path.join(__dirname, 'public'), {
 }));
 
 app.use(rateLimit({ windowMs: 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false }));
+// Tighter cap on anything that changes data (payments, enrolments, applications, assistant) per IP.
+const writeLimiter = rateLimit({ windowMs: 60 * 1000, max: 60, standardHeaders: true, legacyHeaders: false, skip: req => req.method === 'GET' || req.method === 'HEAD' });
+app.use(writeLimiter);
 
 app.use(session({
   name: 'lgou.sid',
@@ -63,7 +77,7 @@ app.use(session({
   cookie: {
     httpOnly: true,
     sameSite: 'lax',
-    secure: process.env.COOKIE_SECURE === 'true', // set COOKIE_SECURE=true once the site is served over HTTPS
+    secure: process.env.COOKIE_SECURE === 'true' || (isProd && process.env.COOKIE_SECURE !== 'false') || forceHttps, // automatic in production; set COOKIE_SECURE=false only for plain-http testing
     maxAge: 2 * 60 * 60 * 1000
   }
 }));
@@ -91,7 +105,7 @@ app.use((req, res, next) => {
   delete req.session.flash;
 
   if (req.session.userId) {
-    const u = db.prepare('SELECT id,username,role,active,full_name_enc,student_no FROM users WHERE id=?').get(req.session.userId);
+    const u = db.prepare('SELECT id,username,role,active,full_name_enc,student_no,must_change FROM users WHERE id=?').get(req.session.userId);
     if (u && u.active) {
       u.full_name = decrypt(u.full_name_enc);
       req.user = u;
@@ -117,6 +131,15 @@ app.use((req, res, next) => {
         message: 'Your session expired or the form was invalid. Go back, refresh the page and try again.'
       });
     }
+  }
+  next();
+});
+
+// Accounts whose password was reset by the office must choose a new one before doing anything else.
+app.use((req, res, next) => {
+  if (req.user && req.user.must_change && !['/account', '/logout'].includes(req.path)) {
+    if (req.method === 'GET') { req.session.flash = { type: 'warn', msg: 'Please choose a new password to continue.' }; return res.redirect('/account'); }
+    return res.status(403).render('error', { title: 'Change your password', message: 'Please choose a new password first (My account).' });
   }
   next();
 });
