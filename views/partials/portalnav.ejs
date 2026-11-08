@@ -1,0 +1,35 @@
+<%
+const ICON = {
+  home: '<path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>',
+  cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/>',
+  doc: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/>',
+  user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 15-5 16 0"/>',
+  book: '<path d="M4 4h7a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H4zM20 4h-6v15h6z"/>',
+  people: '<circle cx="9" cy="8" r="3.5"/><path d="M2 20c1-5 13-5 14 0M17 5a3.5 3.5 0 0 1 0 7M18 14c3 .5 4 3 4 6"/>',
+  cash: '<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>',
+  check: '<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>',
+  gear: '<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M19 5l-2 2M7 17l-2 2"/>'
+};
+const svg = k => '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON[k] + '</svg>';
+const p = typeof currentPath === 'string' ? currentPath : '';
+const is = (x, exact) => exact ? (p === x || p === x + '/') : p.startsWith(x);
+let top = [], bottom = [];
+if (user && user.role === 'admin') {
+  top = [['/admin','Dashboard',1],['/admin/students','Students'],['/admin/teachers','Teachers'],['/admin/payments','Payments'],['/admin/course-approvals','Course approvals'],['/admin/courses','Courses & YouTube'],['/admin/approvals','Completions'],['/admin/certificates','Certificates'],['/admin/emails','Emails'],['/admin/announcements','Announcements'],['/admin/assistant','AI assistant'],['/admin/settings','Settings & Backups']];
+  bottom = [['/admin','Home','home',1],['/admin/students','Students','people'],['/admin/payments','Payments','cash'],['/admin/approvals','Approve','check'],['/admin/settings','Settings','gear']];
+} else if (user && user.role === 'teacher' && teacher && teacher.status === 'approved') {
+  top = [['/teacher','Dashboard',1],['/teacher/courses','My courses'],['/teacher/profile','My public profile']];
+  bottom = [['/teacher','Home','home',1],['/teacher/courses','Courses','book'],['/teacher/profile','Profile','user'],['/account','Account','gear']];
+} else if (user && user.role === 'student') {
+  top = [['/portal','My portal',1],['/portal/schedule','Class timetable'],['/portal/transcript','Transcript'],['/account','Account']];
+  bottom = [['/portal','Home','home',1],['/portal/schedule','Timetable','cal'],['/portal/transcript','Transcript','doc'],['/account','Account','user']];
+}
+%>
+<% if (top.length) { %>
+<div class="subnav"><div class="wrap">
+  <% top.forEach(t => { %><a href="<%= t[0] %>" class="<%= is(t[0], t[2]) ? 'on' : '' %>"><%= t[1] %></a><% }) %>
+</div></div>
+<nav class="bottombar" aria-label="Quick navigation">
+  <% bottom.forEach(t => { %><a href="<%= t[0] %>" class="<%= is(t[0], t[3]) ? 'on' : '' %>"><%- svg(t[2]) %><span><%= t[1] %></span></a><% }) %>
+</nav>
+<% } %>

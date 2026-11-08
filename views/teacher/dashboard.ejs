@@ -1,11 +1,20 @@
 <%- include('../partials/header') %>
+<%
+const ic = (d) => '<svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+const I = { cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/>', doc: '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 13h7M9 17h7"/>', user: '<circle cx="12" cy="8" r="4"/><path d="M4 21c1-5 15-5 16 0"/>', book: '<path d="M4 4h7a3 3 0 0 1 3 3v14a2 2 0 0 0-2-2H4zM20 4h-6v15h6z"/>', plus: '<circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/>', people: '<circle cx="9" cy="8" r="3.5"/><path d="M2 20c1-5 13-5 14 0M17 5a3.5 3.5 0 0 1 0 7M18 14c3 .5 4 3 4 6"/>', cash: '<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/>', check: '<circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-6"/>' };
+%>
 <main><div class="wrap">
-  <h1>Welcome, <%= user.full_name %></h1>
+  <div class="welcome"><div><h1>Welcome, <%= user.full_name %></h1><p>Your classes, students and grades in one place.</p></div></div>
   <div class="stats">
     <div class="stat"><b><%= totals.courses %></b><span>My courses</span></div>
-    <div class="stat"><b><%= totals.students %></b><span>Active students (fee paid)</span></div>
-    <div class="stat"><b><%= totals.awaiting %></b><span>Enrolled, fee not yet confirmed</span></div>
+    <div class="stat good"><b><%= totals.students %></b><span>Active students (fee paid)</span></div>
+    <div class="stat gold"><b><%= totals.awaiting %></b><span>Enrolled, fee not yet confirmed</span></div>
     <div class="stat <%= totals.pending ? 'alertish' : '' %>"><b><%= totals.pending %></b><span>Courses awaiting approval</span></div>
+  </div>
+  <div class="tiles">
+    <a class="tile" href="/teacher/courses"><%- ic(I.book) %>My courses<small>Create &amp; edit courses</small></a>
+    <a class="tile" href="/teacher/profile"><%- ic(I.user) %>My public profile<small>What students see</small></a>
+    <a class="tile" href="/account"><%- ic(I.cash) %>My account<small>Password &amp; details</small></a>
   </div>
 
   <h2>My courses</h2>

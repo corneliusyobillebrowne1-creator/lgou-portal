@@ -13,12 +13,13 @@
 <link rel="stylesheet" href="/style.css">
 <link rel="icon" type="image/png" href="/logo.png">
 </head>
-<body>
+<body class="<%= user && (user.role !== 'teacher' || (teacher && teacher.status === 'approved')) ? 'has-bottom role-' + user.role : '' %>">
 <% if (siteInfo.phones.length) { %><div class="topbar">Questions? Call <% siteInfo.phones.forEach((p, i) => { %><%= i ? ' or ' : '' %><a href="tel:<%= p.tel %>"><%= p.show %></a><% }) %></div><% } %>
 <header class="site-header">
   <div class="bar">
     <a class="brand" href="/"><img class="logo" src="/logo.png" alt="Liberia Gateway Online College logo" width="52" height="52"><span>Liberia Gateway<br><small>Online College</small></span></a>
-    <nav>
+    <button class="navtoggle" id="navtoggle" type="button" aria-expanded="false" aria-controls="mainnav"><span class="bars"></span><span class="sr">Menu</span></button>
+    <nav id="mainnav">
       <a href="/">Home</a>
       <a href="/#courses">Programmes</a>
       <a href="/admissions">Admissions</a>
@@ -37,27 +38,5 @@
     </nav>
   </div>
 </header>
-<% if (user && user.role === 'admin') { %>
-<div class="subnav"><div class="wrap">
-  <a href="/admin" class="<%= currentPath === '/admin' || currentPath === '/admin/' ? 'on' : '' %>">Dashboard</a>
-  <a href="/admin/students" class="<%= currentPath.startsWith('/admin/students') ? 'on' : '' %>">Students</a>
-  <a href="/admin/teachers" class="<%= currentPath.startsWith('/admin/teachers') ? 'on' : '' %>">Teachers</a>
-  <a href="/admin/payments" class="<%= currentPath.startsWith('/admin/payments') ? 'on' : '' %>">Payments</a>
-  <a href="/admin/course-approvals" class="<%= currentPath.startsWith('/admin/course-approvals') ? 'on' : '' %>">Course approvals</a>
-  <a href="/admin/courses" class="<%= currentPath.startsWith('/admin/courses') ? 'on' : '' %>">Courses &amp; YouTube</a>
-  <a href="/admin/approvals" class="<%= currentPath.startsWith('/admin/approvals') ? 'on' : '' %>">Completions</a>
-  <a href="/admin/certificates" class="<%= currentPath.startsWith('/admin/certificates') ? 'on' : '' %>">Certificates</a>
-  <a href="/admin/emails" class="<%= currentPath.startsWith('/admin/emails') ? 'on' : '' %>">Emails</a>
-  <a href="/admin/announcements" class="<%= currentPath.startsWith('/admin/announcements') ? 'on' : '' %>">Announcements</a>
-  <a href="/admin/assistant" class="<%= currentPath.startsWith('/admin/assistant') ? 'on' : '' %>">AI assistant</a>
-  <a href="/admin/settings" class="<%= currentPath.startsWith('/admin/settings') ? 'on' : '' %>">Settings &amp; Backups</a>
-</div></div>
-<% } %>
-<% if (user && user.role === 'teacher' && teacher && teacher.status === 'approved') { %>
-<div class="subnav"><div class="wrap">
-  <a href="/teacher" class="<%= currentPath === '/teacher' || currentPath === '/teacher/' ? 'on' : '' %>">Dashboard</a>
-  <a href="/teacher/courses" class="<%= currentPath.startsWith('/teacher/courses') ? 'on' : '' %>">My courses</a>
-  <a href="/teacher/profile" class="<%= currentPath.startsWith('/teacher/profile') ? 'on' : '' %>">My public profile</a>
-</div></div>
-<% } %>
+<%- include('portalnav') %>
 <% if (flash) { %><div class="wrap"><div class="alert <%= flash.type %>"><%= flash.msg %></div></div><% } %>

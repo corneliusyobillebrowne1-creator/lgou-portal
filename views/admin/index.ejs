@@ -1,17 +1,21 @@
 <%- include('../partials/header') %>
 <main><div class="wrap">
-  <h1>Admin dashboard</h1>
+  <div class="welcome"><div><h1>Admin dashboard</h1><p>Everything that needs you today is shown first.</p></div></div>
+  <h2>Needs your attention</h2>
+  <div class="stats attention">
+    <div class="stat <%= stats.pendingPayments ? 'alertish' : 'good' %>"><b><%= stats.pendingPayments %></b><span><a href="/admin/payments">Payments to confirm</a></span></div>
+    <div class="stat <%= stats.certRequests ? 'alertish' : 'good' %>"><b><%= stats.certRequests %></b><span><a href="/admin/approvals">Certificate requests</a></span></div>
+    <div class="stat <%= stats.teachersPending ? 'alertish' : 'good' %>"><b><%= stats.teachersPending %></b><span><a href="/admin/teachers?status=pending">Teacher applications</a></span></div>
+    <div class="stat <%= stats.coursesPending ? 'alertish' : 'good' %>"><b><%= stats.coursesPending %></b><span><a href="/admin/course-approvals">Courses to approve</a></span></div>
+  </div>
+  <h2>School at a glance</h2>
   <div class="stats">
     <div class="stat"><b><%= stats.students %></b><span>Students</span></div>
     <div class="stat"><b><%= stats.enrollments %></b><span>Enrollments</span></div>
-    <div class="stat"><b><%= money(stats.revenue) %></b><span>Confirmed revenue</span></div>
+    <div class="stat gold"><b><%= money(stats.revenue) %></b><span>Confirmed revenue</span></div>
     <div class="stat alertish"><b><%= money(stats.owed) %></b><span>Fees owed by students</span></div>
-    <div class="stat <%= stats.pendingPayments ? 'alertish' : '' %>"><b><%= stats.pendingPayments %></b><span><a href="/admin/payments">Payments to confirm</a></span></div>
-    <div class="stat <%= stats.certRequests ? 'alertish' : '' %>"><b><%= stats.certRequests %></b><span><a href="/admin/approvals">Certificate requests</a></span></div>
-    <div class="stat <%= stats.teachersPending ? 'alertish' : '' %>"><b><%= stats.teachersPending %></b><span><a href="/admin/teachers?status=pending">Teacher applications</a></span></div>
     <div class="stat"><b><%= stats.teachersApproved %></b><span><a href="/admin/teachers?status=approved">Approved teachers</a></span></div>
-    <div class="stat <%= stats.coursesPending ? 'alertish' : '' %>"><b><%= stats.coursesPending %></b><span><a href="/admin/course-approvals">Courses to approve</a></span></div>
-    <div class="stat"><b><%= stats.certsIssued %></b><span>Certificates issued</span></div>
+    <div class="stat good"><b><%= stats.certsIssued %></b><span>Certificates issued</span></div>
     <div class="stat"><b><%= lastBackup ? fmtDate(lastBackup.mtime.toISOString()) : 'Never' %></b><span><a href="/admin/settings">Last backup</a></span></div>
   </div>
 
