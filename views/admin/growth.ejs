@@ -1,0 +1,14 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <div class="welcome"><div><h1>Quality &amp; growth</h1><p>The tools that make the college trusted: feedback, answers, stories and reminders.</p></div></div>
+  <div class="tiles">
+    <a class="tile" href="/admin/quality">Quality report<small><%= n.reviews %> rating(s) so far</small></a>
+    <a class="tile" href="/admin/complaints">Complaints &amp; messages<small><%= n.complaints %> open</small></a>
+    <a class="tile" href="/admin/questions">Student questions<small><%= n.questions %> waiting</small></a>
+    <a class="tile" href="/admin/stories">Success stories<small><%= n.stories %> published</small></a>
+    <a class="tile" href="/admin/reminders">Reminder emails<small>Unpaid fees &amp; inactive students</small></a>
+    <a class="tile" href="/admin/settings">Trust page text<small>Refund policy &amp; public numbers</small></a>
+  </div>
+  <p class="muted"><%= n.referred %> student(s) joined through a friend's invite link. Invites give no money or prizes; they only count.</p>
+</div></main>
+<%- include('../partials/footer') %>

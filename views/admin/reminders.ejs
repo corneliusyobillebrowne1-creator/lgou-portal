@@ -1,0 +1,15 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <p><a href="/admin/growth">&larr; Quality &amp; growth</a></p>
+  <h1>Reminder emails</h1>
+  <p class="muted">Friendly emails that help students finish. Nobody gets the same reminder twice in 7 days. Email must be set up in Settings.</p>
+  <div class="grid">
+    <form class="card" method="post" action="/admin/reminders/unpaid"><input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+      <h3>Unpaid fee reminder</h3><p>Students enrolled for more than 3 days with no complete fee and no payment waiting. <strong><%= counts.unpaid %></strong> to send now.</p>
+      <button class="btn" type="submit" <%= counts.unpaid ? '' : 'disabled' %>>Send reminders</button></form>
+    <form class="card" method="post" action="/admin/reminders/inactive"><input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+      <h3>Come-back reminder</h3><p>Paid students with unfinished lessons and no progress for 14 days. <strong><%= counts.inactive %></strong> to send now.</p>
+      <button class="btn" type="submit" <%= counts.inactive ? '' : 'disabled' %>>Send reminders</button></form>
+  </div>
+</div></main>
+<%- include('../partials/footer') %>

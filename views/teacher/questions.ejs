@@ -1,0 +1,20 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <%- include('_tabs') %>
+  <h2>Student questions</h2>
+  <% if (!open.length) { %><p class="muted">No questions waiting.</p><% } %>
+  <% open.forEach(q => { %>
+  <form class="card" method="post" action="/teacher/courses/<%= course.id %>/questions/<%= q.id %>">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <p><strong><%= q.body %></strong> <span class="muted">(<%= fmtDate(q.created_at) %>)</span></p>
+    <label for="a<%= q.id %>">Your answer</label><textarea id="a<%= q.id %>" name="answer" maxlength="1500" required></textarea>
+    <p><button class="btn small" type="submit">Send answer</button></p>
+  </form>
+  <% }) %>
+  <% if (done.length) { %><h3>Answered</h3><% done.forEach(q => { %><div class="card flat"><p><strong><%= q.body %></strong></p><p class="pre"><%= q.answer %></p></div><% }) %><% } %>
+
+  <h2>Student feedback <% if (avg.n) { %><span class="badge ok">&#9733; <%= avg.a %> (<%= avg.n %>)</span><% } %></h2>
+  <% if (!reviews.length) { %><p class="muted">No ratings yet. Students can rate the course after they have paid.</p><% } %>
+  <% reviews.forEach(r => { %><div class="card flat"><p><strong>&#9733; <%= r.rating %>/5</strong> <span class="muted">(<%= fmtDate(r.created_at) %>)</span></p><% if (r.comment) { %><p class="pre"><%= r.comment %></p><% } %></div><% }) %>
+</div></main>
+<%- include('../partials/footer') %>

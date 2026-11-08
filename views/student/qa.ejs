@@ -1,0 +1,36 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <p><a href="/portal">&larr; My portal</a></p>
+  <h1>Questions &amp; feedback</h1>
+  <p class="meta"><%= e.course_title %></p>
+
+  <h2>Ask a question</h2>
+  <form class="card" method="post" action="/portal/qa/<%= e.id %>">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label for="body">Your question about this course</label>
+    <textarea id="body" name="body" maxlength="600" required></textarea>
+    <p><button class="btn" type="submit">Send question</button></p>
+  </form>
+
+  <% if (mine.length) { %><h2>My questions</h2>
+  <% mine.forEach(q => { %><div class="card flat"><p><strong><%= q.body %></strong></p>
+    <% if (q.answer) { %><p class="pre"><span class="badge ok">Answered</span> <%= q.answer %></p><% } else { %><p><span class="badge warn">Waiting for an answer</span></p><% } %></div><% }) %><% } %>
+
+  <% if (others.length) { %><h2>Other students' questions</h2>
+  <% others.forEach(q => { %><div class="card flat"><p><strong><%= q.body %></strong></p><p class="pre"><%= q.answer %></p></div><% }) %><% } %>
+
+  <h2>Rate this course</h2>
+  <form class="card" method="post" action="/portal/review/<%= e.id %>">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label for="rating">How good is this course?</label>
+    <select id="rating" name="rating" required>
+      <option value="">Choose...</option>
+      <% [5,4,3,2,1].forEach(n => { %><option value="<%= n %>" <%= review && review.rating === n ? 'selected' : '' %>><%= n %> - <%= ['','Poor','Fair','Good','Very good','Excellent'][n] %></option><% }) %>
+    </select>
+    <label for="comment">Comment (optional)</label>
+    <textarea id="comment" name="comment" maxlength="500"><%= review ? review.comment : '' %></textarea>
+    <p class="muted">Your name is not shown with your rating.</p>
+    <p><button class="btn" type="submit"><%= review ? 'Update my rating' : 'Send rating' %></button></p>
+  </form>
+</div></main>
+<%- include('../partials/footer') %>

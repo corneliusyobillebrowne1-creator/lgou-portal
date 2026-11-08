@@ -7,6 +7,7 @@
     <h1><%= course.title %></h1>
     <p class="meta"><%= durationLabel(course.duration_weeks) %><% if (lessons.length) { %> &middot; <%= lessons.length %> video lessons<% } %> &middot; Pass mark <%= course.pass_mark %>%
       <% if (course.teacher_name) { %> &middot; Taught by <a href="/teachers/<%= course.teacher_id %>"><%= course.teacher_name %></a><% } %></p>
+    <% if (course.rating_count) { %><p class="meta"><strong>&#9733; <%= course.rating_avg %></strong> from <%= course.rating_count %> student rating<%= course.rating_count === 1 ? '' : 's' %></p><% } %>
     <div class="price"><%= money(course.fee_cents) %></div>
     <p class="pre"><%= course.description || course.summary %></p>
     <% if (course.class_schedule) { %><p><strong>Class times:</strong> <%= course.class_schedule %> <span class="muted">(Liberia time)</span></p><% } %>
@@ -19,6 +20,10 @@
     <% } else if (!user) { %>
       <a class="btn red" href="/signup">Sign up to enroll</a> <a class="btn ghost" href="/login">I already have an account</a>
     <% } %>
+    <% const msg = encodeURIComponent(course.title + ' at Liberia Gateway Online College: ' + shareUrl); %>
+    <p class="actions" style="margin-top:14px"><span class="muted">Share:</span>
+      <a class="btn small ghost" href="https://wa.me/?text=<%= msg %>" target="_blank" rel="noopener noreferrer">WhatsApp</a>
+      <a class="btn small ghost" href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(shareUrl) %>" target="_blank" rel="noopener noreferrer">Facebook</a></p>
   </div>
 
   <% if (lessons.length) { %>

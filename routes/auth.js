@@ -25,6 +25,7 @@ function startSession(req, res, user) {
 }
 
 router.get('/signup', (req, res) => {
+  if (/^[A-Z0-9]{6,12}$/.test(String(req.query.ref || ''))) req.session.ref = String(req.query.ref);
   if (req.user) return res.redirect(homeFor(req.user));
   res.render('signup', { title: 'Create account', form: {}, error: null });
 });
@@ -56,6 +57,7 @@ router.post('/signup', signupLimiter, async (req, res, next) => {
     const info = db.prepare(`INSERT INTO users (username,password_hash,role,full_name_enc,email_enc,email_idx,phone_enc)
       VALUES (?,?,?,?,?,?,?)`).run(f.username, hash, 'student', encrypt(f.full_name), encrypt(f.email), idx, encrypt(f.phone));
     assignStudentNo(info.lastInsertRowid);
+    if (req.session.ref) { const r = db.prepare("SELECT id FROM users WHERE referral_code=? AND role='student'").get(req.session.ref); if (r) db.prepare('UPDATE users SET referred_by=? WHERE id=?').run(r.id, info.lastInsertRowid); }
     audit(info.lastInsertRowid, 'signup', f.username, req.ip);
     startSession(req, res, { id: info.lastInsertRowid, role: 'student' });
   } catch (e) { next(e); }

@@ -1,0 +1,16 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <p><a href="/admin/growth">&larr; Quality &amp; growth</a></p>
+  <h1>Quality report</h1>
+  <p class="muted">Ratings come only from students who paid for the course. A course is flagged when it has 3 or more ratings averaging below 3.5.</p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Course</th><th>Teacher</th><th>Enrolled</th><th>Completed</th><th>Completion</th><th>Rating</th><th>Open questions</th></tr></thead>
+    <tbody><% rows.forEach(r => { %><tr>
+      <td><strong><%= r.title %></strong><% if (r.low) { %> <span class="badge bad">Needs attention</span><% } %></td><td><%= r.teacher %></td><td><%= r.enrolled %></td><td><%= r.certified %></td><td><%= r.completion %>%</td>
+      <td><%= r.reviews ? '★ ' + r.rating + ' (' + r.reviews + ')' : 'No ratings' %></td><td><%= r.open_q %></td></tr><% }) %></tbody>
+  </table></div>
+  <h2>Latest comments</h2>
+  <% if (!comments.length) { %><p class="muted">No comments yet.</p><% } %>
+  <% comments.forEach(c => { %><div class="card flat"><p><strong>★ <%= c.rating %>/5</strong> &middot; <%= c.title %> <span class="muted">(<%= fmtDate(c.created_at) %>)</span></p><p class="pre"><%= c.comment %></p></div><% }) %>
+</div></main>
+<%- include('../partials/footer') %>

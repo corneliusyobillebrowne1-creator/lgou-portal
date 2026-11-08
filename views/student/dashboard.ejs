@@ -53,6 +53,7 @@ const I = { cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3
           <% if (e.has_classroom) { %><a class="btn red" href="/portal/classroom/<%= e.id %>" target="_blank" rel="noopener noreferrer">Join Google Classroom</a><% } %>
           <% if (e.lesson_total > 0) { %><a class="btn" href="/portal/learn/<%= e.id %>"><%= e.lesson_done ? 'Continue lessons' : 'Start lessons' %></a><% } %>
           <% if (e.teacher_id) { %><a class="btn ghost" href="/portal/results/<%= e.id %>">Attendance &amp; grades</a><% } %>
+          <a class="btn ghost" href="/portal/qa/<%= e.id %>">Ask a question<%= reviewed.has(e.id) ? '' : ' / Rate' %></a>
           <% if (e.status === 'enrolled' && e.eligible) { %>
             <form method="post" action="/portal/request-certificate/<%= e.id %>" class="inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn red" type="submit">Request certificate</button></form>
           <% } %>
@@ -65,6 +66,15 @@ const I = { cal: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3
       <% } %>
     </article>
   <% }) %>
+  </div>
+
+  <h2 id="invite">Invite your friends</h2>
+  <div class="card flat">
+    <p>Share the college with friends. <strong><%= invite.joined %></strong> friend<%= invite.joined === 1 ? '' : 's' %> joined with your link.</p>
+    <p><input type="text" readonly value="<%= invite.link %>"></p>
+    <% const imsg = encodeURIComponent('Study online at Liberia Gateway Online College: ' + invite.link); %>
+    <div class="actions"><a class="btn small" href="https://wa.me/?text=<%= imsg %>" target="_blank" rel="noopener noreferrer">Share on WhatsApp</a>
+    <a class="btn small ghost" href="https://www.facebook.com/sharer/sharer.php?u=<%= encodeURIComponent(invite.link) %>" target="_blank" rel="noopener noreferrer">Share on Facebook</a></div>
   </div>
 
   <h2 id="available">Available courses</h2>

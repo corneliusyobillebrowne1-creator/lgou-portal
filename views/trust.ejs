@@ -1,0 +1,53 @@
+<%- include('partials/header') %>
+<main><div class="wrap">
+  <div class="welcome"><div><h1>Trust &amp; quality</h1><p>How we earn your trust: honest information, verified certificates, real teachers and a way to tell us when something is wrong.</p></div></div>
+
+  <% if (stats) { %>
+  <h2>Our numbers</h2>
+  <div class="stats">
+    <div class="stat"><b><%= stats.students %></b><span>Students</span></div>
+    <div class="stat gold"><b><%= stats.courses %></b><span>Open programmes</span></div>
+    <div class="stat"><b><%= stats.teachers %></b><span>Approved teachers</span></div>
+    <div class="stat good"><b><%= stats.certs %></b><span>Certificates issued</span></div>
+  </div>
+  <% } %>
+
+  <h2>Recognition and approval</h2>
+  <div class="card flat"><p class="pre"><%= accreditation %></p></div>
+
+  <h2>Every certificate can be checked</h2>
+  <div class="card flat"><p>Each certificate, diploma and AA degree has a long verification code. Employers and schools can check it in seconds, and revoked certificates show as revoked.</p>
+    <a class="btn" href="/verify">Verify a certificate</a></div>
+
+  <h2>Our teachers</h2>
+  <% if (!teachers.length) { %><p class="muted">Teachers who join and are approved by the college will be listed here.</p><% } %>
+  <div class="grid">
+    <% teachers.forEach(t => { %>
+    <article class="card teachercard"><span class="avatar"><%= initials(t.full_name) %></span><div>
+      <h3><a href="/teachers/<%= t.user_id %>"><%= t.full_name %></a></h3>
+      <p class="meta"><%= t.headline %><% if (t.experience_years) { %> &middot; <%= t.experience_years %> years' experience<% } %></p></div></article>
+    <% }) %>
+  </div>
+  <p class="muted">Every teacher is reviewed and approved by the college office before they can run a course.</p>
+
+  <h2>Fees and refunds</h2>
+  <div class="card flat"><p class="pre"><%= refund %></p><p class="muted">Payments are confirmed by the college and you receive an email receipt each time.</p></div>
+
+  <% if (stories.length) { %>
+  <h2>Student stories</h2>
+  <div class="grid">
+    <% stories.forEach(s => { %><article class="card news"><p class="pre">&ldquo;<%= s.quote %>&rdquo;</p><p class="meta"><strong><%= s.name %></strong><% if (s.course) { %> &middot; <%= s.course %><% } %></p></article><% }) %>
+  </div>
+  <% } %>
+
+  <h2 id="feedback">Tell us when something is wrong</h2>
+  <form class="card formcard wide" method="post" action="/trust/complaint">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <p class="muted">Complaints, suggestions or questions go straight to the college office. Only the office can read them.</p>
+    <label for="name">Your name</label><input type="text" id="name" name="name" maxlength="80" required>
+    <label for="contact">Phone number or email (so we can reply)</label><input type="text" id="contact" name="contact" maxlength="120" required>
+    <label for="message">Your message</label><textarea id="message" name="message" maxlength="2000" required></textarea>
+    <p><button class="btn" type="submit">Send to the college</button></p>
+  </form>
+</div></main>
+<%- include('partials/footer') %>

@@ -1,0 +1,18 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <p><a href="/admin/growth">&larr; Quality &amp; growth</a></p>
+  <h1>Success stories</h1>
+  <p class="muted">Shown on the public Trust page. Only publish a real story, with the student's permission.</p>
+  <form class="card" method="post" action="/admin/stories">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label for="name">Student name (as they agree to show it)</label><input type="text" id="name" name="name" maxlength="80" required>
+    <label for="course">Course (optional)</label><input type="text" id="course" name="course" maxlength="120">
+    <label for="quote">Their words</label><textarea id="quote" name="quote" maxlength="600" required></textarea>
+    <label class="check"><input type="checkbox" name="consent" value="yes"> This student gave permission to publish this story.</label>
+    <p><button class="btn" type="submit">Publish story</button></p>
+  </form>
+  <% items.forEach(s => { %><div class="card flat"><p class="pre">&ldquo;<%= s.quote %>&rdquo;</p><p class="meta"><strong><%= s.name %></strong> <%= s.course ? '· ' + s.course : '' %> <span class="badge <%= s.active ? 'ok' : 'warn' %>"><%= s.active ? 'shown' : 'hidden' %></span></p>
+    <div class="actions"><form class="inline" method="post" action="/admin/stories/<%= s.id %>/toggle"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn small ghost" type="submit"><%= s.active ? 'Hide' : 'Show' %></button></form>
+    <form class="inline" method="post" action="/admin/stories/<%= s.id %>/delete"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><button class="btn small ghost" type="submit">Delete</button></form></div></div><% }) %>
+</div></main>
+<%- include('../partials/footer') %>

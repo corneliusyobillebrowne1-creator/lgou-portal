@@ -1,0 +1,16 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <p><a href="/admin/growth">&larr; Quality &amp; growth</a></p>
+  <h1>Complaints &amp; messages</h1>
+  <% if (!items.length) { %><p class="muted">Nothing received yet.</p><% } %>
+  <% items.forEach(c => { %>
+  <form class="card" method="post" action="/admin/complaints/<%= c.id %>">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <p><span class="badge <%= c.status === 'open' ? 'warn' : 'ok' %>"><%= c.status %></span> <strong><%= c.name %></strong> &middot; <%= c.contact %> <span class="muted">(<%= fmtDate(c.created_at) %>)</span></p>
+    <p class="pre"><%= c.message %></p>
+    <label for="n<%= c.id %>">Office note</label><input type="text" id="n<%= c.id %>" name="note" maxlength="500" value="<%= c.admin_note || '' %>">
+    <div class="actions"><button class="btn small" name="status" value="resolved" type="submit">Mark resolved</button><button class="btn small ghost" name="status" value="open" type="submit">Keep open</button></div>
+  </form>
+  <% }) %>
+</div></main>
+<%- include('../partials/footer') %>

@@ -21,7 +21,12 @@ function myEnrollment(req, res) {
 router.get('/', (req, res) => {
   const enrollments = enrollmentRows('e.user_id=?', [req.user.id]);
   const available = publicCourses('c.id NOT IN (SELECT course_id FROM enrollments WHERE user_id=?)', [req.user.id]);
-  res.render('student/dashboard', { title: 'My Portal', enrollments, available, news: site.announcements(3) });
+  // Invite link for friends (counts only - no rewards)
+  let code = db.prepare('SELECT referral_code c FROM users WHERE id=?').get(req.user.id).c;
+  if (!code) { code = require('crypto').randomBytes(5).toString('hex').toUpperCase(); db.prepare('UPDATE users SET referral_code=? WHERE id=?').run(code, req.user.id); }
+  const invite = { link: emails.baseUrl(req) + '/signup?ref=' + code, joined: db.prepare('SELECT COUNT(*) n FROM users WHERE referred_by=?').get(req.user.id).n };
+  const reviewed = new Set(db.prepare('SELECT enrollment_id FROM reviews WHERE user_id=?').all(req.user.id).map(r => r.enrollment_id));
+  res.render('student/dashboard', { title: 'My Portal', enrollments, available, news: site.announcements(3), invite, reviewed });
 });
 
 // Academic transcript: every programme with progress, grade average and any qualification issued. Only the student's own records.

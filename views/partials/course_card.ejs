@@ -4,6 +4,7 @@
   <% if (!c.ready) { %><span class="badge warn">Coming soon</span><% } %>
   <h3><%= c.title %></h3>
   <p><%= c.summary %></p>
+  <% if (c.rating_count) { %><p class="meta"><strong>&#9733; <%= c.rating_avg %></strong> (<%= c.rating_count %> rating<%= c.rating_count === 1 ? '' : 's' %>)</p><% } %>
   <p class="meta">
     <%= durationLabel(c.duration_weeks) %>
     <% if (c.lesson_count) { %>&middot; <%= c.lesson_count %> video lessons<% } %>

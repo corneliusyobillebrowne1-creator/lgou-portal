@@ -34,7 +34,7 @@ router.get('/courses/:id', (req, res) => {
   const course = publicCourses('c.id=?', [Number(req.params.id)])[0];
   if (!course) return res.status(404).render('error', { title: 'Not found', message: 'Course not found.' });
   const lessons = db.prepare('SELECT title FROM lessons WHERE course_id=? ORDER BY position, id').all(course.id);
-  res.render('course', { title: course.title, course, lessons });
+  res.render('course', { title: course.title, course, lessons, shareUrl: require('../lib/emails').baseUrl(req) + '/courses/' + course.id });
 });
 
 router.get('/teachers', (req, res) => {

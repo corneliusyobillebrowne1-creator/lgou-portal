@@ -411,6 +411,7 @@ router.post('/announcements/:id/delete', (req, res) => {
 // ---------- settings & backups ----------
 router.get('/settings', (req, res) => {
   res.render('admin/settings', {
+    refundPolicy: getSetting('refund_policy') || 'Please ask the college office about fees and refunds before you pay. Every payment is checked by the college, and you receive an email receipt when it is confirmed.', showStats: getSetting('show_stats') === 'yes',
     title: 'Settings & Backups', instructions: getSetting('payment_instructions'), methodsText: methodsText(), mail: mailer.status(), site: require('../lib/site').info(), backups: listBackups(),
     maxFee: (parseInt(getSetting('teacher_max_fee_cents', '5000'), 10) / 100).toFixed(2)
   });
@@ -425,6 +426,8 @@ router.post('/settings', (req, res) => {
   if (has('college_contact')) txt('college_contact', 600);
   if (has('admission_requirements')) txt('admission_requirements', 1500);
   if (has('accreditation_statement')) txt('accreditation_statement', 1200);
+  if (has('refund_policy')) txt('refund_policy', 1200);
+  if (has('show_stats')) setSetting('show_stats', b.show_stats === 'yes' ? 'yes' : 'no');
   if (has('email_provider')) mailer.save(b);
   audit(req.user.id, 'settings_updated', Object.keys(b).filter(k => k !== '_csrf').join(','), req.ip);
   flash(req, 'ok', 'Settings saved.');

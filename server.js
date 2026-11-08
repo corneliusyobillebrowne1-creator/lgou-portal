@@ -65,7 +65,7 @@ app.use(express.static(path.join(__dirname, 'public'), {
 
 app.use(rateLimit({ windowMs: 60 * 1000, max: 300, standardHeaders: true, legacyHeaders: false }));
 // Tighter cap on anything that changes data (payments, enrolments, applications, assistant) per IP.
-const writeLimiter = rateLimit({ windowMs: 60 * 1000, max: 60, standardHeaders: true, legacyHeaders: false, skip: req => req.method === 'GET' || req.method === 'HEAD' });
+const writeLimiter = rateLimit({ windowMs: 60 * 1000, max: parseInt(process.env.WRITE_LIMIT, 10) || 60, standardHeaders: true, legacyHeaders: false, skip: req => req.method === 'GET' || req.method === 'HEAD' });
 app.use(writeLimiter);
 
 app.use(session({
@@ -146,11 +146,15 @@ app.use((req, res, next) => {
 });
 
 app.use('/', require('./routes/public'));
+app.use('/', require('./routes/trust'));
 app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/teacherApply'));
 app.use('/portal', require('./routes/student'));
+app.use('/portal', require('./routes/studentExtras'));
 app.use('/teacher', require('./routes/teacher'));
+app.use('/teacher', require('./routes/teacherExtras'));
 app.use('/admin/assistant', require('./routes/assistant'));
+app.use('/admin', require('./routes/adminExtras'));
 app.use('/admin', require('./routes/admin'));
 
 app.use((req, res) => res.status(404).render('error', { title: 'Not found', message: 'That page does not exist.' }));

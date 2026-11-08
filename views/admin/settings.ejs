@@ -25,6 +25,10 @@
     <label for="accreditation_statement">Recognition / accreditation statement (shown on the About page)</label>
     <textarea id="accreditation_statement" name="accreditation_statement" maxlength="1200"><%= site.accreditation %></textarea>
     <p class="muted">Only state accreditation or government recognition if the college really holds it.</p>
+    <label for="refund_policy">Fees &amp; refunds statement (shown on the Trust page)</label>
+    <textarea id="refund_policy" name="refund_policy" maxlength="1200"><%= refundPolicy %></textarea>
+    <label for="show_stats">Show student / certificate numbers on the Trust page?</label>
+    <select id="show_stats" name="show_stats"><option value="no" <%= showStats ? '' : 'selected' %>>No (hide for now)</option><option value="yes" <%= showStats ? 'selected' : '' %>>Yes, show them</option></select>
     <p><button class="btn" type="submit">Save college information</button></p>
   </form>
 

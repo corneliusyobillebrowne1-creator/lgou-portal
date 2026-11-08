@@ -1,0 +1,16 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <p><a href="/admin/growth">&larr; Quality &amp; growth</a></p>
+  <h1>Student questions</h1>
+  <p class="muted">Unanswered questions on all courses. Teacher-run courses are normally answered by their teacher.</p>
+  <% if (!items.length) { %><p class="muted">No questions waiting.</p><% } %>
+  <% items.forEach(q => { %>
+  <form class="card" method="post" action="/admin/questions/<%= q.id %>">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <p><span class="badge"><%= q.title %></span> <span class="muted"><%= fmtDate(q.created_at) %></span></p><p><strong><%= q.body %></strong></p>
+    <label for="a<%= q.id %>">Answer</label><textarea id="a<%= q.id %>" name="answer" maxlength="1500" required></textarea>
+    <p><button class="btn small" type="submit">Send answer</button></p>
+  </form>
+  <% }) %>
+</div></main>
+<%- include('../partials/footer') %>
