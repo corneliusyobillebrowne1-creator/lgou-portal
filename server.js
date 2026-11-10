@@ -22,6 +22,9 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.disable('x-powered-by');
 
+// Health check for hosts (answers over plain http; nothing private)
+app.get('/healthz', (req, res) => res.type('text').send('ok'));
+
 // ---- force HTTPS everywhere in production (needs TRUST_PROXY so the host's X-Forwarded-Proto is believed) ----
 const forceHttps = process.env.FORCE_HTTPS === 'true' || (isProd && !!(process.env.TRUST_PROXY || process.env.VERCEL) && process.env.FORCE_HTTPS !== 'false');
 if (forceHttps) {
