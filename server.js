@@ -167,8 +167,16 @@ app.use((err, req, res, next) => {
 
 if (!process.env.VERCEL) {
   const PORT = process.env.PORT || 3000;
-  app.listen(PORT, process.env.HOST || '0.0.0.0', () => {
+  const server = app.listen(PORT, process.env.HOST || '0.0.0.0', () => {
     console.log(`Liberia Gateway Online College portal running on port ${PORT}`);
+    console.log(`Open it in your browser:  http://localhost:${PORT}`);
+  });
+  server.on('error', (e) => {
+    if (e.code === 'EADDRINUSE') {
+      console.error(`\nPort ${PORT} is already in use. The college site is probably ALREADY RUNNING in another window.`);
+      console.error(`Try opening http://localhost:${PORT} in your browser. If it does not work, close the other black window (or restart the computer) and start again.`);
+    } else console.error('\nThe site could not start:', e.message);
+    process.exit(1);
   });
 
   // ---- automatic daily database backup ----
