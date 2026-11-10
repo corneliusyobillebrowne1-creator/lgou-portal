@@ -190,7 +190,7 @@ function client() {
   if (bdir) check('backup file created', fs.readdirSync(bdir).some(f => /^lgou-.*\.db$/.test(f)));
 
   r = await stu.get('/portal');
-  check('student sees student number', /Student no\. LGOC-\d{4}-\d{5}/.test(r.text));
+  check('student sees student number', /Student no\. LGOC-8\d\d/.test(r.text));
   r = await stu.get('/portal/transcript');
   check('student transcript opens', r.status === 200 && r.text.includes('Academic transcript') && r.text.includes('Mary Kollie'));
   r = await anon.get('/portal/transcript');
