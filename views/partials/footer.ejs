@@ -4,8 +4,22 @@
   <div><strong>Academics</strong><br><a href="/#courses">Programmes</a><br><a href="/admissions">Admissions</a><br><a href="/#fees">Fees</a><br><a href="/trust">Trust &amp; quality</a><br><a href="/verify">Verify a certificate</a></div>
   <div><strong>Students</strong><br><a href="/login">Student portal</a><br><a href="/signup">Apply / Sign up</a><br><a href="/teachers">Our teachers</a><br><a href="/teach">Teach with us</a></div>
   <div><strong>Get the app</strong><br><button class="btn small" id="installapp" type="button" hidden>Install the college app</button><span id="iosinstall" hidden>On iPhone: tap Share, then Add to Home Screen.</span><span class="muted">Works on Android, iPhone and computers. No app store needed.</span></div>
+  <% if (siteInfo.social.whatsapp || siteInfo.social.facebook || siteInfo.social.tiktok) { %><div><strong>Follow &amp; chat</strong><br>
+    <% if (siteInfo.social.whatsapp) { %><a href="<%= siteInfo.social.whatsapp %>" target="_blank" rel="noopener noreferrer">WhatsApp</a><br><% } %>
+    <% if (siteInfo.social.facebook) { %><a href="<%= siteInfo.social.facebook %>" target="_blank" rel="noopener noreferrer">Facebook</a><br><% } %>
+    <% if (siteInfo.social.tiktok) { %><a href="<%= siteInfo.social.tiktok %>" target="_blank" rel="noopener noreferrer">TikTok</a><% } %></div><% } %>
   <div class="foot-copy">&copy; <%= new Date().getFullYear() %> Liberia Gateway Online College</div>
 </div></footer>
+<% if (siteInfo.chat) { %>
+<button id="chatfab" class="chatfab" type="button" aria-expanded="false" aria-controls="chatbox">Ask us</button>
+<section id="chatbox" class="chatbox" hidden aria-label="Ask the college">
+  <div class="chathead"><strong>Ask the college</strong><button id="chatclose" type="button" aria-label="Close">&times;</button></div>
+  <div id="chatlog" class="chatlog" aria-live="polite"><p class="bot">Hello! Ask me about courses, fees, how to apply or how to pay.</p></div>
+  <form id="chatform" class="chatform"><input type="hidden" id="chatcsrf" value="<%= csrfToken() %>"><input type="text" id="chatq" maxlength="400" placeholder="Type your question" autocomplete="off" required><button class="btn small" type="submit">Send</button></form>
+  <p class="chatnote">AI answers can be wrong. For anything important, call the college<% if (siteInfo.social.whatsapp) { %> or <a href="<%= siteInfo.social.whatsapp %>" target="_blank" rel="noopener noreferrer">WhatsApp us</a><% } %>.</p>
+</section>
+<script src="/chat.js" defer></script>
+<% } %>
 <script src="/pwa.js" defer></script>
 <script src="/filter.js" defer></script>
 <script src="/nav.js" defer></script>

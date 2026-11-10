@@ -31,6 +31,7 @@ router.post('/trust/complaint', limiter, (req, res) => {
   const info = db.prepare('INSERT INTO complaints (user_id,name_enc,contact_enc,message_enc) VALUES (?,?,?,?)')
     .run(req.user ? req.user.id : null, encrypt(f.name), encrypt(f.contact), encrypt(f.message));
   audit(req.user ? req.user.id : null, 'complaint_received', String(info.lastInsertRowid), req.ip);
+  require('../lib/n8n').events.complaintReceived(Number(info.lastInsertRowid));
   req.session.flash = { type: 'ok', msg: 'Thank you. Your message has reached the college office. We will contact you.' };
   res.redirect('/trust');
 });

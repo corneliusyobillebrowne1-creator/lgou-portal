@@ -1,0 +1,46 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <p><a href="/admin/growth">&larr; Quality &amp; growth</a></p>
+  <h1>Automation &amp; social</h1>
+  <% if (once) { %><div class="alert warn"><strong><%= once.kind %></strong> (shown only once, copy it now into n8n):<br><code><%= once.value %></code></div><% } %>
+
+  <form class="card" method="post" action="/admin/automation">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <h2 style="margin-top:0">1. School number and social accounts</h2>
+    <p class="muted">These show on the website only after you fill them in. Fill them in only when the account really exists.</p>
+    <label for="school_msg_number">School number used for texts (sender shown to n8n)</label><input type="text" id="school_msg_number" name="school_msg_number" value="<%= c.from %>" maxlength="16">
+    <label for="whatsapp_number">School WhatsApp number (adds a "Chat on WhatsApp" link)</label><input type="text" id="whatsapp_number" name="whatsapp_number" value="<%= social.whatsapp %>" maxlength="16" placeholder="0880035290">
+    <label for="facebook_url">Facebook page link</label><input type="text" id="facebook_url" name="facebook_url" value="<%= social.facebook %>" maxlength="200" placeholder="https://www.facebook.com/yourpage">
+    <label for="tiktok_url">TikTok account link</label><input type="text" id="tiktok_url" name="tiktok_url" value="<%= social.tiktok %>" maxlength="200" placeholder="https://www.tiktok.com/@yourcollege">
+
+    <h2>2. Website chat box (AI)</h2>
+    <p class="muted"><% if (!hasKey) { %>Needs the AI key: save it in <a href="/admin/assistant">AI assistant</a> first.<% } else { %>The chat box answers visitors from public college information only. It never sees student accounts.<% } %></p>
+    <label for="ai_public_enabled">Show the chat box on the website?</label>
+    <select id="ai_public_enabled" name="ai_public_enabled"><option value="yes" <%= publicEnabled ? 'selected' : '' %>>Yes</option><option value="no" <%= publicEnabled ? '' : 'selected' %>>No</option></select>
+    <label for="chat_cap">Most AI answers per day (protects your AI bill)</label><input type="number" id="chat_cap" name="chat_cap" min="10" max="5000" value="<%= chatCap %>">
+
+    <h2>3. n8n connection</h2>
+    <label for="n8n_webhook_url">n8n webhook address (from your n8n "Webhook" node, https only)</label><input type="text" id="n8n_webhook_url" name="n8n_webhook_url" value="<%= c.url %>" maxlength="300">
+    <label for="n8n_enabled">Send events to n8n?</label>
+    <select id="n8n_enabled" name="n8n_enabled"><option value="no" <%= c.enabled ? '' : 'selected' %>>No</option><option value="yes" <%= c.enabled ? 'selected' : '' %>>Yes</option></select>
+    <label for="n8n_include_phone">Include the student's phone number in events (needed to text them)?</label>
+    <select id="n8n_include_phone" name="n8n_include_phone"><option value="no" <%= c.includePhone ? '' : 'selected' %>>No (safer)</option><option value="yes" <%= c.includePhone ? 'selected' : '' %>>Yes</option></select>
+    <p><button class="btn" type="submit">Save</button></p>
+  </form>
+
+  <div class="grid">
+    <form class="card" method="post" action="/admin/automation/secret"><input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+      <h3>Signing secret</h3><p class="muted">n8n uses it to confirm an event really came from this website. <%= c.secret ? 'A secret is set.' : 'No secret yet.' %></p><button class="btn small" type="submit"><%= c.secret ? 'Make a new secret' : 'Create secret' %></button></form>
+    <form class="card" method="post" action="/admin/automation/token"><input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+      <h3>Access token for n8n</h3><p class="muted">n8n sends it to ask the website's AI a question: POST <code><%= base %>/api/n8n/ask</code> with header <code>Authorization: Bearer &lt;token&gt;</code>. <%= c.hasToken ? 'A token is set.' : 'No token yet.' %></p><button class="btn small" type="submit"><%= c.hasToken ? 'Make a new token' : 'Create token' %></button></form>
+    <form class="card" method="post" action="/admin/automation/test"><input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+      <h3>Test</h3><p class="muted">Sends a test event to your n8n webhook.</p><button class="btn small ghost" type="submit">Send test event</button></form>
+  </div>
+
+  <h2>Recent events</h2>
+  <% if (!log.length) { %><p class="muted">Nothing sent yet.</p><% } else { %>
+  <div class="tablewrap"><table><thead><tr><th>When (UTC)</th><th>Event</th><th>Result</th><th>Detail</th></tr></thead>
+    <tbody><% log.forEach(l => { %><tr><td><%= l.created_at %></td><td><%= l.event %></td><td><span class="badge <%= l.status === 'sent' ? 'ok' : 'bad' %>"><%= l.status %></span></td><td><%= l.detail %></td></tr><% }) %></tbody></table></div><% } %>
+  <p class="muted">Setup steps: see AUTOMATION.md and SOCIAL-SETUP.md in the project.</p>
+</div></main>
+<%- include('../partials/footer') %>

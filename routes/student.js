@@ -91,6 +91,7 @@ router.post('/pay/:id', (req, res) => {
   db.prepare('INSERT INTO payments (enrollment_id,user_id,amount_cents,method,reference_enc) VALUES (?,?,?,?,?)')
     .run(e.id, req.user.id, amount, method, encrypt(ref));
   audit(req.user.id, 'payment_submitted', `enrollment ${e.id}`, req.ip);
+  require('../lib/n8n').events.paymentSubmitted(e.id, amount, method);
   req.session.flash = { type: 'ok', msg: 'Payment submitted. You will get access once the school confirms it.' };
   res.redirect('/portal/pay/' + e.id);
 });

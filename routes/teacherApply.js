@@ -61,6 +61,7 @@ router.post('/teach', limiter, async (req, res, next) => {
     });
     const id = tx();
     audit(id, 'teacher_applied', f.username, req.ip);
+    require('../lib/n8n').events.teacherApplied(id);
     req.session.regenerate(err => {
       if (err) return next(err);
       req.session.userId = id;

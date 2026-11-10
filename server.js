@@ -123,7 +123,7 @@ app.use((req, res, next) => {
 });
 
 app.use((req, res, next) => {
-  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method)) {
+  if (['POST', 'PUT', 'PATCH', 'DELETE'].includes(req.method) && !(req.path === '/api/n8n/ask' && /^Bearer /i.test(req.headers.authorization || ''))) {
     const t = String((req.body && req.body._csrf) || '');
     const s = String(req.session.csrf || '');
     if (!t || !s || t.length !== s.length || !crypto.timingSafeEqual(Buffer.from(t), Buffer.from(s))) {
@@ -147,6 +147,7 @@ app.use((req, res, next) => {
 
 app.use('/', require('./routes/public'));
 app.use('/', require('./routes/trust'));
+app.use('/', require('./routes/automation'));
 app.use('/', require('./routes/auth'));
 app.use('/', require('./routes/teacherApply'));
 app.use('/portal', require('./routes/student'));

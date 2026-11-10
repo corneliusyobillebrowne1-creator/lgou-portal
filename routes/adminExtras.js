@@ -7,6 +7,9 @@ const { enrollmentRows } = require('../lib/queries');
 const mailer = require('../lib/mailer');
 const emails = require('../lib/emails');
 const { money } = require('../lib/util');
+const n8n = require('../lib/n8n');
+const { getSetting, setSetting } = require('../lib/db');
+const ai = require('../lib/collegeai');
 router.use(requireAdmin);
 const flash = (req, type, msg) => { req.session.flash = { type, msg }; };
 const one = (sql, ...a) => db.prepare(sql).get(...a).n;
@@ -100,6 +103,40 @@ router.post('/reminders/:kind', async (req, res) => {
   audit(req.user.id, 'reminders_' + kind, sent + ' sent, ' + failed + ' failed', req.ip);
   flash(req, sent || !failed ? 'ok' : 'warn', `${sent} reminder(s) sent${failed ? ', ' + failed + ' could not be sent (check Emails settings)' : ''}.`);
   res.redirect('/admin/reminders');
+});
+
+// ---- automation (n8n), messaging number, social links, website chat ----
+router.get('/automation', (req, res) => {
+  const once = req.session.once || null; delete req.session.once;
+  res.render('admin/automation', { title: 'Automation & social', c: n8n.config(), once, log: db.prepare('SELECT * FROM n8n_log ORDER BY id DESC LIMIT 20').all(),
+    chatOn: ai.enabled(), hasKey: !!getSetting('ai_api_key_enc'), chatCap: getSetting('ai_public_daily_cap', '300'), publicEnabled: getSetting('ai_public_enabled') !== 'no',
+    social: { whatsapp: getSetting('whatsapp_number') || '', facebook: getSetting('facebook_url') || '', tiktok: getSetting('tiktok_url') || '' }, base: emails.baseUrl(req) });
+});
+router.post('/automation', (req, res) => {
+  const b = req.body; const url = String(b.n8n_webhook_url || '').trim();
+  if (url && !n8n.validUrl(url)) { flash(req, 'warn', 'The n8n webhook address must be a public https:// address.'); return res.redirect('/admin/automation'); }
+  setSetting('n8n_webhook_url', url);
+  setSetting('n8n_enabled', b.n8n_enabled === 'yes' ? 'yes' : 'no');
+  setSetting('n8n_include_phone', b.n8n_include_phone === 'yes' ? 'yes' : 'no');
+  const num = String(b.school_msg_number || '').replace(/[^0-9+]/g, '').slice(0, 16); setSetting('school_msg_number', num || n8n.DEFAULT_FROM);
+  setSetting('ai_public_enabled', b.ai_public_enabled === 'no' ? 'no' : 'yes');
+  const cap = parseInt(b.chat_cap, 10); if (cap >= 10 && cap <= 5000) setSetting('ai_public_daily_cap', String(cap));
+  const wa = String(b.whatsapp_number || '').replace(/[^0-9+]/g, '').slice(0, 16); setSetting('whatsapp_number', wa);
+  const sx = require('../lib/site'); const dummy = {};
+  for (const [k, hosts] of [['facebook_url', ['facebook.com', 'fb.com']], ['tiktok_url', ['tiktok.com']]]) {
+    const v = String(b[k] || '').trim(); let ok = !v;
+    if (v) { try { const u = new URL(v); ok = u.protocol === 'https:' && hosts.some(h => u.hostname === h || u.hostname.endsWith('.' + h)); } catch {} }
+    if (!ok) { flash(req, 'warn', 'The ' + k.replace('_url', '') + ' link must be a https:// address on the real site.'); return res.redirect('/admin/automation'); }
+    setSetting(k, v);
+  }
+  audit(req.user.id, 'automation_settings', '', req.ip); flash(req, 'ok', 'Saved.'); res.redirect('/admin/automation');
+});
+router.post('/automation/secret', (req, res) => { const s = n8n.newSecret(); n8n.saveSecret(s); req.session.once = { kind: 'Signing secret', value: s }; audit(req.user.id, 'n8n_secret_created', '', req.ip); res.redirect('/admin/automation'); });
+router.post('/automation/token', (req, res) => { const t = n8n.newSecret(); n8n.saveToken(t); req.session.once = { kind: 'Access token for n8n', value: t }; audit(req.user.id, 'n8n_token_created', '', req.ip); res.redirect('/admin/automation'); });
+router.post('/automation/test', async (req, res) => {
+  const r = await n8n.emit('test', { message: 'Test from the college website', note: 'If you see this in n8n, the connection works.' }, { force: true });
+  flash(req, r.ok ? 'ok' : 'warn', r.ok ? 'Test event sent. Check your n8n workflow.' : 'Test failed: ' + (r.error || ('n8n answered ' + r.status) || 'check the address and secret') + '.');
+  res.redirect('/admin/automation');
 });
 
 module.exports = router;

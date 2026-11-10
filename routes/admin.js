@@ -107,6 +107,7 @@ router.post('/enrollments/:id/payment', async (req, res) => {
   const ins = db.prepare(`INSERT INTO payments (enrollment_id,user_id,amount_cents,method,reference_enc,status,reviewed_by,reviewed_at)
     VALUES (?,?,?,?,?,'confirmed',?,datetime('now'))`).run(e.id, e.user_id, amount, method, encrypt(ref), req.user.id);
   audit(req.user.id, 'payment_recorded', `enrollment ${e.id}: ${amount} cents`, req.ip);
+  require('../lib/n8n').events.paymentConfirmed(Number(ins.lastInsertRowid));
   const mr = await emails.emailReceipt(Number(ins.lastInsertRowid), emails.baseUrl(req));
   flash(req, 'ok', 'Payment recorded and confirmed.' + emails.note(mr, 'Receipt'));
   res.redirect('/admin/students/' + e.user_id);
@@ -130,6 +131,7 @@ function reviewPayment(decision) {
     db.prepare("UPDATE payments SET status=?, reviewed_by=?, reviewed_at=datetime('now') WHERE id=?").run(decision, req.user.id, p.id);
     audit(req.user.id, 'payment_' + decision, `payment ${p.id} (${p.amount_cents} cents)`, req.ip);
     let extra = '';
+    if (decision === 'confirmed') require('../lib/n8n').events.paymentConfirmed(p.id);
     if (decision === 'confirmed') extra = emails.note(await emails.emailReceipt(p.id, emails.baseUrl(req)), 'Receipt');
     flash(req, 'ok', 'Payment ' + decision + '.' + extra);
     res.redirect('/admin/payments');
@@ -324,6 +326,7 @@ router.post('/approvals/:id/approve', async (req, res) => {
   const certNo = tx();
   audit(req.user.id, 'certificate_issued', `${certNo} (enrollment ${e.id})`, req.ip);
   const cid = db.prepare('SELECT id FROM certificates WHERE cert_no=?').get(certNo).id;
+  require('../lib/n8n').events.certificateIssued(cid);
   const mr = await emails.emailCertificate(cid, emails.baseUrl(req));
   flash(req, 'ok', 'Approved. Certificate ' + certNo + ' has been issued.' + emails.note(mr, 'Certificate PDF'));
   res.redirect('/admin/certificates');

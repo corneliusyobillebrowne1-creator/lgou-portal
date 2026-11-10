@@ -1,7 +1,7 @@
 // Service worker: caches ONLY public static files (styles, icons, scripts) so the app opens fast.
 // It never stores pages, student data, forms or anything from /portal, /admin or /teacher.
-const CACHE = 'lgoc-static-v2';
-const STATIC = ['/style.css', '/logo.png', '/icon-192.png', '/filter.js', '/nav.js', '/print.js', '/pwa.js', '/offline.html'];
+const CACHE = 'lgoc-static-v3';
+const STATIC = ['/style.css', '/logo.png', '/icon-192.png', '/filter.js', '/nav.js', '/chat.js', '/print.js', '/pwa.js', '/offline.html'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(STATIC)).then(() => self.skipWaiting()));

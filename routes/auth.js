@@ -59,6 +59,7 @@ router.post('/signup', signupLimiter, async (req, res, next) => {
     assignStudentNo(info.lastInsertRowid);
     if (req.session.ref) { const r = db.prepare("SELECT id FROM users WHERE referral_code=? AND role='student'").get(req.session.ref); if (r) db.prepare('UPDATE users SET referred_by=? WHERE id=?').run(r.id, info.lastInsertRowid); }
     audit(info.lastInsertRowid, 'signup', f.username, req.ip);
+    require('../lib/n8n').events.studentSignedUp(info.lastInsertRowid);
     startSession(req, res, { id: info.lastInsertRowid, role: 'student' });
   } catch (e) { next(e); }
 });

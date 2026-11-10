@@ -27,7 +27,8 @@ router.post('/qa/:id', (req, res) => {
   if (body.length < 5 || body.length > 600) { flash(req, 'warn', 'Write your question (5 to 600 characters).'); return res.redirect('/portal/qa/' + e.id); }
   const open = db.prepare('SELECT COUNT(*) n FROM questions WHERE course_id=? AND user_id=? AND answer IS NULL').get(e.course_id, req.user.id).n;
   if (open >= 5) { flash(req, 'warn', 'You already have 5 questions waiting for an answer. Please wait for a reply first.'); return res.redirect('/portal/qa/' + e.id); }
-  db.prepare('INSERT INTO questions (course_id,user_id,body) VALUES (?,?,?)').run(e.course_id, req.user.id, body);
+  const qi = db.prepare('INSERT INTO questions (course_id,user_id,body) VALUES (?,?,?)').run(e.course_id, req.user.id, body);
+  require('../lib/n8n').events.questionAsked(e.course_id, Number(qi.lastInsertRowid));
   flash(req, 'ok', 'Question sent. Your teacher or the college will answer here.');
   res.redirect('/portal/qa/' + e.id);
 });
