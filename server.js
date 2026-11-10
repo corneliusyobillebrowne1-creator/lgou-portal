@@ -167,10 +167,12 @@ app.use((err, req, res, next) => {
 
 if (!process.env.VERCEL) {
   const PORT = process.env.PORT || 3000;
-  const server = app.listen(PORT, process.env.HOST || '0.0.0.0', () => {
+  // No fixed host: Node listens on both IPv4 and IPv6, so http://localhost:PORT works on every computer (even when 'localhost' means ::1).
+  const server = (process.env.HOST ? app.listen(PORT, process.env.HOST, onListen) : app.listen(PORT, onListen));
+  function onListen() {
     console.log(`Liberia Gateway Online College portal running on port ${PORT}`);
-    console.log(`Open it in your browser:  http://localhost:${PORT}`);
-  });
+    console.log(`Open it in your browser:  http://localhost:${PORT}   (or http://127.0.0.1:${PORT})`);
+  }
   server.on('error', (e) => {
     if (e.code === 'EADDRINUSE') {
       console.error(`\nPort ${PORT} is already in use. The college site is probably ALREADY RUNNING in another window.`);
