@@ -102,6 +102,7 @@ app.use((req, res, next) => {
   res.locals.durationLabel = site.durationLabel;
   res.locals.badgeClass = site.badgeClass;
   res.locals.siteInfo = site.info();
+  res.locals.tempStorage = require('./lib/crypto').TEMP_STORAGE;
   res.locals.flash = req.session.flash || null;
   delete req.session.flash;
 

@@ -1,5 +1,6 @@
 <%- include('../partials/header') %>
 <main><div class="wrap">
+  <% if (tempStorage) { %><div class="alert warn"><strong>Warning: temporary storage.</strong> This site is running without a permanent disk, so students, payments and courses will be LOST when the host restarts. This is fine for a demo, but not for real students. Move to a host with a persistent disk (see DEPLOY.md).</div><% } %>
   <div class="welcome"><div><h1>Admin dashboard</h1><p>Everything that needs you today is shown first.</p></div></div>
   <h2>Needs your attention</h2>
   <div class="stats attention">
