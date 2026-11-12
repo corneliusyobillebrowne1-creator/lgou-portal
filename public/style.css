@@ -218,3 +218,12 @@ progress::-webkit-progress-bar{background:#e6ecf8}progress::-webkit-progress-val
 .chatnote{margin:0;padding:0 12px 10px;font-size:.75rem;color:var(--muted)}
 @media(max-width:860px){body.has-bottom .chatfab{bottom:84px}body.has-bottom .chatbox{bottom:140px}}
 @media print{.chatfab,.chatbox{display:none!important}}
+
+/* ---- AI staff team ---- */
+.teamnav{margin-bottom:10px}
+.tasklink{display:block;margin:8px 0;text-decoration:none;color:inherit}
+.tasklink:hover{border-color:var(--navy2)}
+.teamchat{display:flex;flex-direction:column;gap:8px;max-height:420px;overflow:auto;padding:4px 0}
+.tmsg{background:#eef2fb;border-radius:12px;padding:8px 12px;max-width:92%;align-self:flex-start}
+.tmsg.me{background:#fbf1cf;align-self:flex-end}
+.tmsg small{display:block;color:#5b6678}

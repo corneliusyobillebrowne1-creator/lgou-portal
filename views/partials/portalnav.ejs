@@ -15,8 +15,8 @@ const p = typeof currentPath === 'string' ? currentPath : '';
 const is = (x, exact) => exact ? (p === x || p === x + '/') : p.startsWith(x);
 let top = [], bottom = [];
 if (user && user.role === 'admin') {
-  top = [['/admin','Dashboard',1],['/admin/students','Students'],['/admin/teachers','Teachers'],['/admin/payments','Payments'],['/admin/course-approvals','Course approvals'],['/admin/courses','Courses & YouTube'],['/admin/approvals','Completions'],['/admin/certificates','Certificates'],['/admin/emails','Emails'],['/admin/announcements','Announcements'],['/admin/growth','Quality & growth'],['/admin/assistant','AI assistant'],['/admin/settings','Settings & Backups']];
-  bottom = [['/admin','Home','home',1],['/admin/students','Students','people'],['/admin/payments','Payments','cash'],['/admin/approvals','Approve','check'],['/admin/settings','Settings','gear']];
+  top = [['/admin','Dashboard',1],['/admin/students','Students'],['/admin/teachers','Teachers'],['/admin/payments','Payments'],['/admin/course-approvals','Course approvals'],['/admin/courses','Courses & YouTube'],['/admin/approvals','Completions'],['/admin/certificates','Certificates'],['/admin/emails','Emails'],['/admin/announcements','Announcements'],['/team','AI Team'],['/admin/growth','Quality & growth'],['/admin/assistant','AI assistant'],['/admin/settings','Settings & Backups']];
+  bottom = [['/admin','Home','home',1],['/admin/students','Students','people'],['/admin/payments','Payments','cash'],['/admin/approvals','Approve','check'],['/team','AI Team','people']];
 } else if (user && user.role === 'teacher' && teacher && teacher.status === 'approved') {
   top = [['/teacher','Dashboard',1],['/teacher/courses','My courses'],['/teacher/profile','My public profile']];
   bottom = [['/teacher','Home','home',1],['/teacher/courses','Courses','book'],['/teacher/profile','Profile','user'],['/account','Account','gear']];

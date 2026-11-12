@@ -1,0 +1,22 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <%- include('_nav') %>
+  <h1>Finance records</h1><p class="muted">Daniel (AI) reads these figures. Student payments come from the Payments page; add other income and expenses here. <a href="/team/finance?format=csv">Download CSV</a></p>
+  <div class="stats">
+    <div class="stat good"><b><%= money(f.confirmed_total) %></b><span>Confirmed student payments</span></div>
+    <div class="stat alertish"><b><%= money(f.pending_amount) %></b><span><%= f.pending_count %> pending</span></div>
+    <div class="stat"><b><%= money(f.income) %></b><span>Other income</span></div>
+    <div class="stat"><b><%= money(f.expense) %></b><span>Expenses</span></div>
+  </div>
+  <form class="card" method="post" action="/team/finance">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label for="fk">Type</label><select id="fk" name="kind"><option value="income">Income</option><option value="expense">Expense</option></select>
+    <label for="fc">Category</label><input type="text" id="fc" name="category" maxlength="60" required placeholder="e.g. Hosting, Ads, Tutoring">
+    <label for="fam">Amount (USD)</label><input type="text" id="fam" name="amount" inputmode="decimal" required>
+    <label for="fd">Date</label><input type="date" id="fd" name="entry_date" required>
+    <label for="fn">Note</label><input type="text" id="fn" name="note" maxlength="200">
+    <p><button class="btn" type="submit">Save record</button></p>
+  </form>
+  <% entries.forEach(e => { %><form class="card" method="post" action="/team/finance/<%= e.id %>/delete"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><span class="badge <%= e.kind === 'income' ? 'ok' : 'warn' %>"><%= e.kind %></span> <strong><%= money(e.amount_cents) %></strong> &middot; <%= e.category %> &middot; <%= e.entry_date %><%= e.note ? ' · ' + e.note : '' %> <button class="btn small ghost" type="submit">Delete</button></form><% }) %>
+</div></main>
+<%- include('../partials/footer') %>

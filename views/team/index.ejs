@@ -1,0 +1,33 @@
+<%- include('../partials/header') %>
+<main><div class="wrap" data-sig="<%= sig %>" id="teampage">
+  <%- include('_nav') %>
+  <div class="welcome"><div><h1>Your AI staff team</h1><p>Six AI team members work for you around the clock. They write drafts and records; they cannot post, email or move money.</p></div></div>
+  <% if (!aiOn) { %><div class="alert error">The AI key is not saved yet, so the team cannot work. Add it in <a href="/admin/assistant">Admin &rarr; AI assistant</a>.</div><% } %>
+  <% if (!on) { %><div class="alert error">The team is switched off in <a href="/team/settings">settings</a>.</div><% } %>
+  <div class="stats">
+    <div class="stat <%= c.review ? 'alertish' : '' %>"><b><%= c.review || 0 %></b><span>Waiting for approval</span></div>
+    <div class="stat"><b><%= (c.queued || 0) + (c.working || 0) %></b><span>In progress</span></div>
+    <div class="stat good"><b><%= c.approved || 0 %></b><span>Approved</span></div>
+    <div class="stat"><b><%= calls %>/<%= cap %></b><span>AI calls today</span></div>
+  </div>
+  <h2>Give an instruction</h2>
+  <form class="card" method="post" action="/team/instruct">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label for="target">Send to</label>
+    <select id="target" name="target"><option value="all">Whole team (the Director plans it)</option><% agents.forEach(a => { %><option value="<%= a.key %>"><%= a.name %> - <%= a.title %></option><% }) %></select>
+    <label for="text">Your instruction</label><textarea id="text" name="text" maxlength="3000" required placeholder="Example: Promote the new Business Administration diploma this week."></textarea>
+    <p><button class="btn" type="submit">Send</button></p>
+  </form>
+  <% if (review.length) { %><h2>Needs your decision</h2><% review.forEach(t => { %><%- include('_task', { t }) %><% }) %><% } %>
+  <h2>The team</h2>
+  <div class="tiles">
+    <% agents.forEach(a => { %><a class="tile" href="/team/agent/<%= a.key %>"><%= a.name %> <small>AI</small><small><%= a.title %></small></a><% }) %>
+  </div>
+  <h2>Latest work</h2>
+  <% if (!recent.length) { %><p class="muted">No tasks yet. Send an instruction above or open a team member and press a shortcut.</p><% } %>
+  <% recent.forEach(t => { %><%- include('_task', { t }) %><% }) %>
+  <form method="post" action="/team/run-now"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><p><button class="btn ghost small" type="submit">Run pending work now</button> <span class="muted">Only needed on hosts without an always-on worker.</span></p></form>
+  <% if (reports.length) { %><h2>Latest reports</h2><% reports.forEach(r => { %><a class="card tasklink" href="/team/reports/<%= r.id %>"><strong><%= r.title %></strong><br><small class="muted"><%= r.created_at %></small></a><% }) %><% } %>
+</div></main>
+<script src="/team.js" defer></script>
+<%- include('../partials/footer') %>

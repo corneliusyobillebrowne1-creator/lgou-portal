@@ -1,0 +1,8 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <%- include('_nav') %>
+  <h1>Secretary's log</h1><p class="muted">Miriam records every task, date, submission and decision here. Permanent. <a href="/team/log?format=csv">Download CSV</a></p>
+  <% if (!rows.length) { %><p class="muted">Nothing recorded yet.</p><% } %>
+  <% rows.forEach(l => { %><p class="muted"><%= l.at %> &middot; <strong><%= names[l.actor] || l.actor %></strong> &middot; <%= l.action %><%= l.task_id ? ' · ' : '' %><% if (l.task_id) { %><a href="/team/tasks/<%= l.task_id %>">#<%= l.task_id %></a><% } %><%= l.detail ? ' - ' + l.detail : '' %></p><% }) %>
+</div></main>
+<%- include('../partials/footer') %>

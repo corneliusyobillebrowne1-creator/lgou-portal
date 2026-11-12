@@ -1,0 +1,1 @@
+<a class="card tasklink" href="/team/tasks/<%= t.id %>"><span class="badge <%= t.status === 'approved' ? 'ok' : (['rejected','failed'].includes(t.status) ? 'bad' : 'warn') %>"><%= t.status %></span> <strong>#<%= t.id %> <%= t.title %></strong><br><small class="muted"><%= t.aname %> &middot; <%= t.created_at %><%= t.due_at ? ' · due ' + t.due_at : '' %></small></a>

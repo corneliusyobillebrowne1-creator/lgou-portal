@@ -1,0 +1,28 @@
+<%- include('../partials/header') %>
+<main><div class="wrap" data-sig="<%= sig %>" id="teampage">
+  <%- include('_nav') %>
+  <p><a href="/team">&larr; Team</a></p>
+  <h1><%= a.name %> <small class="muted">(AI)</small></h1>
+  <p><strong><%= a.title %></strong></p>
+  <div class="card flat"><p><strong>Personality:</strong> <%= a.personality %></p><p><strong>Responsibilities:</strong> <%= a.duties %></p></div>
+  <% if (presets.length) { %><h2>Quick tasks</h2>
+  <% presets.forEach((p, i) => { %><form method="post" action="/team/quick" style="display:inline"><input type="hidden" name="_csrf" value="<%= csrfToken() %>"><input type="hidden" name="agent" value="<%= a.key %>"><input type="hidden" name="i" value="<%= i %>"><button class="btn small" type="submit"><%= p[0] %></button></form> <% }) %><% } %>
+  <h2><%= a.key === 'director' ? 'Assign a task to a team member (one click)' : 'Give ' + a.name + ' a task' %></h2>
+  <form class="card" method="post" action="/team/tasks">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <% if (a.key === 'director') { %><input type="hidden" name="by" value="director"><label for="ag">Assign to</label><select id="ag" name="agent"><% agents.filter(x => x.key !== 'director').forEach(x => { %><option value="<%= x.key %>"><%= x.name %> - <%= x.title %></option><% }) %></select>
+    <% } else { %><input type="hidden" name="agent" value="<%= a.key %>"><% } %>
+    <label for="tt">Title</label><input type="text" id="tt" name="title" maxlength="140" required>
+    <label for="ti">Instructions</label><textarea id="ti" name="instructions" maxlength="4000" required></textarea>
+    <label for="tp">Priority</label><select id="tp" name="priority"><option value="normal">Normal</option><option value="high">High</option><option value="low">Low</option></select>
+    <label for="td">Deadline (optional)</label><input type="date" id="td" name="due">
+    <p><button class="btn" type="submit">Assign task</button></p>
+  </form>
+  <h2>Chat with <%= a.name %></h2>
+  <%- include('_chat') %>
+  <h2><%= a.name %>'s work</h2>
+  <% if (!mine.length) { %><p class="muted">No tasks yet.</p><% } %>
+  <% mine.forEach(t => { %><%- include('_task', { t }) %><% }) %>
+</div></main>
+<script src="/team.js" defer></script>
+<%- include('../partials/footer') %>

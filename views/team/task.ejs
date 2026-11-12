@@ -1,0 +1,26 @@
+<%- include('../partials/header') %>
+<main><div class="wrap" data-sig="<%= sig %>" id="teampage">
+  <%- include('_nav') %>
+  <p><a href="/team/tasks">&larr; Work history</a></p>
+  <h1>#<%= t.id %> <%= t.title %></h1>
+  <p><span class="badge <%= t.status === 'approved' ? 'ok' : (['rejected','failed'].includes(t.status) ? 'bad' : 'warn') %>"><%= t.status %></span> <%= t.aname %> &middot; <%= t.priority %> priority &middot; created by <%= names[t.created_by] || t.created_by %> &middot; <%= t.created_at %><%= t.due_at ? ' · due ' + t.due_at : '' %> &middot; revisions: <%= t.revisions %></p>
+  <h2>Instructions</h2><div class="card pre"><%= t.instructions %></div>
+  <h2>Finished work</h2><div class="card pre"><%= t.result || 'Nothing yet.' %></div>
+  <% if (t.feedback) { %><h2>Director's feedback</h2><div class="card pre"><%= t.feedback %></div><% } %>
+  <p><a class="btn small ghost" href="/team/tasks/<%= t.id %>/download">Download (.md)</a></p>
+  <form class="card" method="post" action="/team/tasks/<%= t.id %>/approve" id="decide">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label for="note">Your note (optional)</label><input type="text" id="note" name="note" maxlength="1000">
+    <div class="actions">
+      <button class="btn small" type="submit">Approve</button>
+      <button class="btn small ghost" type="submit" formaction="/team/tasks/<%= t.id %>/reject">Send back for changes</button>
+      <button class="btn small ghost" type="submit" formaction="/team/tasks/<%= t.id %>/retry">Retry</button>
+      <button class="btn small ghost" type="submit" formaction="/team/tasks/<%= t.id %>/cancel">Cancel</button>
+    </div>
+  </form>
+  <% if (subs.length) { %><h2>Tasks created from this</h2><% subs.forEach(s => { %><%- include('_task', { t: s }) %><% }) %><% } %>
+  <h2>Record of this task</h2>
+  <% log.forEach(l => { %><p class="muted"><%= l.at %> &middot; <strong><%= names[l.actor] || l.actor %></strong> &middot; <%= l.action %><%= l.detail ? ': ' + l.detail : '' %></p><% }) %>
+</div></main>
+<script src="/team.js" defer></script>
+<%- include('../partials/footer') %>

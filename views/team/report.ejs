@@ -1,0 +1,8 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <%- include('_nav') %>
+  <p><a href="/team/reports">&larr; Reports</a></p>
+  <h1><%= r.title %></h1><p class="muted"><%= r.created_at %> &middot; <%= r.aname %> (AI) &middot; <a href="/team/reports/<%= r.id %>?download=1">Download (.md)</a></p>
+  <div class="card pre"><%= r.body %></div>
+</div></main>
+<%- include('../partials/footer') %>

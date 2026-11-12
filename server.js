@@ -14,6 +14,7 @@ const { homeFor } = require('./lib/auth');
 const { runBackup, listBackups } = require('./lib/backup');
 
 const isProd = process.env.NODE_ENV === 'production';
+require('./lib/team'); // creates the AI staff tables before any route uses them
 const app = express();
 
 // Hosts like Render and Vercel put a proxy in front; trust it so HTTPS detection and client IPs are right.
@@ -159,6 +160,7 @@ app.use('/portal', require('./routes/studentExtras'));
 app.use('/teacher', require('./routes/teacher'));
 app.use('/teacher', require('./routes/teacherExtras'));
 app.use('/admin/assistant', require('./routes/assistant'));
+app.use('/team', require('./routes/team'));
 app.use('/admin', require('./routes/adminExtras'));
 app.use('/admin', require('./routes/admin'));
 
@@ -173,6 +175,7 @@ if (!process.env.VERCEL) {
   // No fixed host: Node listens on both IPv4 and IPv6, so http://localhost:PORT works on every computer (even when 'localhost' means ::1).
   const server = (process.env.HOST ? app.listen(PORT, process.env.HOST, onListen) : app.listen(PORT, onListen));
   function onListen() {
+    require('./lib/team').startWorker();
     console.log(`Liberia Gateway Online College portal running on port ${PORT}`);
     console.log(`Open it in your browser:  http://localhost:${PORT}   (or http://127.0.0.1:${PORT})`);
   }

@@ -1,0 +1,9 @@
+<div class="teamchat" id="teamchat">
+<% if (!msgs.length) { %><p class="muted">No messages yet.</p><% } %>
+<% msgs.forEach(m => { %><div class="tmsg <%= m.sender === 'owner' ? 'me' : '' %>"><small><strong><%= names[m.sender] || m.sender %></strong><%= m.sender !== 'owner' && m.sender !== 'system' ? ' (AI)' : '' %> &middot; <%= m.created_at %></small><div class="pre"><%= m.body %></div></div><% }) %>
+</div>
+<form method="post" action="/team/chat" class="chatform">
+  <input type="hidden" name="_csrf" value="<%= csrfToken() %>"><input type="hidden" name="channel" value="<%= chan %>">
+  <label for="ct">Message</label><textarea id="ct" name="text" maxlength="1000" required></textarea>
+  <p><button class="btn" type="submit">Send</button> <span class="muted">The AI member replies in a few seconds.</span></p>
+</form>

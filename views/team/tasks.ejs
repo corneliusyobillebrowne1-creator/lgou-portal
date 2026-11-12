@@ -1,0 +1,11 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <%- include('_nav') %>
+  <h1>Work history</h1>
+  <form method="get" class="card flat"><label for="fs">Status</label><select id="fs" name="status"><option value="">All</option><% STS.forEach(s => { %><option value="<%= s %>" <%= st === s ? 'selected' : '' %>><%= s %></option><% }) %></select>
+    <label for="fa">Team member</label><select id="fa" name="agent"><option value="">All</option><% agents.forEach(a => { %><option value="<%= a.key %>" <%= ag === a.key ? 'selected' : '' %>><%= a.name %></option><% }) %></select>
+    <p><button class="btn small" type="submit">Filter</button> <a class="btn small ghost" href="/team/tasks?format=csv&status=<%= encodeURIComponent(st) %>&agent=<%= encodeURIComponent(ag) %>">Download CSV</a></p></form>
+  <% if (!rows.length) { %><p class="muted">No tasks found.</p><% } %>
+  <% rows.forEach(t => { %><%- include('_task', { t }) %><% }) %>
+</div></main>
+<%- include('../partials/footer') %>

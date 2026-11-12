@@ -15,7 +15,12 @@ function cleanHistory(raw) {
 async function reply(q, h) {
   q = String(q || '').trim();
   if (q.length < 2) return { status: 400, answer: 'Please type your question.' };
-  try { return { status: 200, answer: await ai.answer(q, h) }; }
+  try {
+    const answer = await ai.answer(q, h);
+    // Grace (AI Support Officer) keeps the last 90 days of website chat so she can write support summaries.
+    try { require('../lib/db').db.prepare('INSERT INTO support_chats (question, answer) VALUES (?,?)').run(q.slice(0, 400), answer.slice(0, 1500)); } catch (e) { /* table is created by lib/team.js */ }
+    return { status: 200, answer };
+  }
   catch (e) { return { status: 503, answer: e.message === 'busy' ? 'Lots of people are asking right now. ' + site.info().contact : FALLBACK() }; }
 }
 

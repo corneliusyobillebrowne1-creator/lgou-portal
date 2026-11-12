@@ -1,0 +1,8 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <%- include('_nav') %>
+  <h1>Reports</h1>
+  <% if (!rows.length) { %><p class="muted">Reports appear here when work is approved.</p><% } %>
+  <% rows.forEach(r => { %><a class="card tasklink" href="/team/reports/<%= r.id %>"><strong><%= r.title %></strong><br><small class="muted"><%= r.created_at %> &middot; <%= r.kind %></small></a><% }) %>
+</div></main>
+<%- include('../partials/footer') %>

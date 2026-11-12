@@ -1,0 +1,15 @@
+<%- include('../partials/header') %>
+<main><div class="wrap">
+  <%- include('_nav') %>
+  <h1>Team settings</h1>
+  <p class="muted">The AI key is saved in <a href="/admin/assistant">Admin &rarr; AI assistant</a>. AI calls today: <%= calls %>.</p>
+  <form class="card" method="post" action="/team/settings">
+    <input type="hidden" name="_csrf" value="<%= csrfToken() %>">
+    <label class="check"><input type="checkbox" name="enabled" value="on" <%= s.on ? 'checked' : '' %>> Team switched on</label>
+    <label class="check"><input type="checkbox" name="auto" value="on" <%= s.auto ? 'checked' : '' %>> Daily summaries (Secretary, Support) and Monday finance report, automatically</label>
+    <label for="cap">Daily limit of AI calls (protects your bill)</label><input type="number" id="cap" name="cap" min="5" max="2000" value="<%= s.cap %>">
+    <label for="model">AI model (leave empty for the default)</label><input type="text" id="model" name="model" maxlength="60" value="<%= s.model %>">
+    <p><button class="btn" type="submit">Save</button></p>
+  </form>
+</div></main>
+<%- include('../partials/footer') %>
